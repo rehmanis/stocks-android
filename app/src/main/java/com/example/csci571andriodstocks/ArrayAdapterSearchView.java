@@ -2,6 +2,8 @@ package com.example.csci571andriodstocks;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,11 +25,12 @@ public class ArrayAdapterSearchView extends SearchView {
         initialize();
     }
 
-    @SuppressLint("RestrictedApi")
+
     public void initialize() {
         mSearchAutoComplete = findViewById(R.id.search_src_text);
         mSearchAutoComplete.setDropDownBackgroundResource(R.color.white);
-        mSearchAutoComplete.setThreshold(0);
+//        mSearchAutoComplete.setThreshold(3);
+//        mSearchAutoComplete.setDropDownHeight(600);
         this.setAdapter(null);
         this.setOnItemClickListener(null);
     }
@@ -41,12 +44,22 @@ public class ArrayAdapterSearchView extends SearchView {
         mSearchAutoComplete.setOnItemClickListener(listener);
     }
 
+    public void addTextChangedListener(TextWatcher watcher) {
+        mSearchAutoComplete.addTextChangedListener(watcher);
+    }
+
+
+
     public void setAdapter(ArrayAdapter<?> adapter) {
         mSearchAutoComplete.setAdapter(adapter);
     }
 
     public void setText(String text) {
         mSearchAutoComplete.setText(text);
+    }
+
+    public Editable getText() {
+        return mSearchAutoComplete.getText();
     }
 
 }
