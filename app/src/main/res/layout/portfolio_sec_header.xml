@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="30dp"
-    android:padding="2dp">
+    android:padding="2dp"
+    android:background="@color/section_header">
 
     <TextView
         android:id="@+id/tvTitle"
@@ -15,6 +16,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="8dp"
         android:textStyle="bold"
+        android:gravity="center_vertical"
         tools:text="Title test text" />
 
 

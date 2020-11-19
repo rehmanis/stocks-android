@@ -9,5 +9,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="splash">#f3f3f3</color>
     <color name="grey">#f3f3f3</color>
+    <color name="section_header">#e0e3e5</color>
 
 </resources>

@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -21,42 +23,62 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.SearchView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 public class MainActivity extends AppCompatActivity implements WatchlistSection.ClickListener {
 
-    private SectionedRecyclerViewAdapter sectionedAdapter;
-    private AutoSuggestAdapter autoSuggestAdapter;
     private static final int TRIGGER_AUTO_COMPLETE = 100;
     private static final long AUTO_COMPLETE_DELAY = 300;
+    public static final String SHARED_PREFS_FILE = "mypref";
+    public static final String FAVOURITES = "favouritesKey";
+    public static final String PORTFOLIO = "portfolioKey";
+
+    private SectionedRecyclerViewAdapter sectionedAdapter;
+    private AutoSuggestAdapter autoSuggestAdapter;
     private Handler handler;
+    private ArrayList<String> myFavourites;
+    private ArrayList<String> myPortfolio;
 
-//    String restaurants[] = {
-//            "KFC",
-//            "Dominos",
-//            "Pizza Hut",
-//            "Burger King",
-//            "Subway",
-//            "Dunkin' Donuts",
-//            "Starbucks",
-//            "Cafe Coffee Day"
-//    };
-
+    private static SharedPreferences sharedPreferences;
+    private static SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        handleIntent(getIntent());
         setContentView(R.layout.activity_main);
+
+        // load tasks from preference
+        sharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        myFavourites = (ArrayList) getList(FAVOURITES);
+        myPortfolio = (ArrayList) getList(PORTFOLIO);
+
+        //create a date string.
+        String date_n = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(new Date());
+        //get hold of textview.
+        TextView date  = (TextView) findViewById(R.id.date_view_id);
+        //set it as current date.
+        date.setText(date_n);
 
         sectionedAdapter = new SectionedRecyclerViewAdapter();
 
@@ -169,4 +191,49 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
             }
         });
     }
+
+    public <T> void setList(String key, List<T> list) {
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+
+        set(key, json);
+    }
+
+    private static void set(String key, String value) {
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+
+    public List<String> getList(String key){
+        List<String> arrayItems = new ArrayList<>();
+        String serializedObject = sharedPreferences.getString(key, null);
+        if (serializedObject != null) {
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<String>>(){}.getType();
+            arrayItems = gson.fromJson(serializedObject, type);
+        }
+        return arrayItems;
+    }
+
+    private void handleIntent(Intent intent) {
+
+        Log.i("INTENT", "use entered the search " );
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //use the query to search your data somehow
+            Log.i("SEARCH", "use entered the search " + query);
+            Toast toast = Toast.makeText(this, "search done", Toast.LENGTH_LONG);
+            toast.show();
+        }
+    }
+
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+//        setIntent(intent);
+//        handleIntent(intent);
+//    }
+
+
 }

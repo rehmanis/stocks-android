@@ -7,8 +7,14 @@
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingTop="1dp"
+    android:paddingBottom="1dp">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginTop="2dp"
+        android:background="#c0c0c0"/>
 
     <TextView
         android:id="@+id/company_ticker"
@@ -63,12 +69,7 @@
         app:layout_constraintEnd_toStartOf="@+id/company_price_change"
         app:layout_constraintTop_toBottomOf="@+id/company_price" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="64dp" />
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
