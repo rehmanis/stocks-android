@@ -4,6 +4,7 @@
     <item android:id="@+id/search"
         android:title="search bar"
         android:icon="@drawable/ic_search_black_24dp"
-        app:actionViewClass="com.example.csci571andriodstocks.ArrayAdapterSearchView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        android:tint="@color/black"
         app:showAsAction="collapseActionView|ifRoom" />
 </menu>

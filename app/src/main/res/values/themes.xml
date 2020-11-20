@@ -1,23 +1,35 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.CSCI571AndriodStocks" parent="Theme.MaterialComponents.Light">
+    <style name="Theme.CSCI571AndriodStocks" parent="Theme.AppCompat.Light">
+
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/grey</item>
         <item name="colorPrimaryVariant">@color/grey</item>
-<!--        <item name="android:textStyle">bold</item>-->
 
-<!--        <item name="colorOnPrimary">@color/teal_200</item>-->
-        <!-- Secondary brand color. -->
-<!--        <item name="colorSecondary">@color/teal_200</item>-->
-<!--        <item name="colorSecondaryVariant">@color/teal_700</item>-->
-<!--        <item name="colorOnSecondary">@color/black</item>-->
-        <!-- Status bar color. -->
-<!--        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
-        <!-- Customize your theme here. -->
+<!--        <item name="actionBarStyle">@style/MySearchViewStyle</item>-->
+
     </style>
 
-<!--    <style name="MyTheme.MyActionBar.TitleTextStyle" parent="Theme.MaterialComponents.Light.DarkActionBar">-->
-<!--        <item name="android:textStyle">bold</item>-->
-<!--    </style>-->
+    <style name='MySearchViewStyle' parent='Widget.AppCompat.SearchView'>
+        
+        <!-- Background for the search query section (e.g. EditText) -->
+<!--        <item name="queryBackground">@drawable/ic_search_black_24dp</item>-->
+        <!-- Background for the actions section (e.g. voice, submit) -->
+<!--        <item name="submitBackground">...</item>-->
+<!--        &lt;!&ndash; Close button icon &ndash;&gt;-->
+<!--        <item name="closeIcon">...</item>-->
+<!--        &lt;!&ndash; Search button icon &ndash;&gt;-->
+<!--        <item name="searchIcon">...</item>-->
+<!--        &lt;!&ndash; Go/commit button icon &ndash;&gt;-->
+<!--        <item name="goIcon">...</item>-->
+<!--        &lt;!&ndash; Voice search button icon &ndash;&gt;-->
+<!--        <item name="voiceIcon"></item>-->
+        <!-- Commit icon shown in the query suggestion row -->
+        <item name="commitIcon">@drawable/ic_search_black_24dp</item>
+<!--        &lt;!&ndash; Layout for query suggestion rows &ndash;&gt;-->
+<!--        <item name="suggestionRowLayout">...</item>-->
+    </style>
+
+
 
 </resources>

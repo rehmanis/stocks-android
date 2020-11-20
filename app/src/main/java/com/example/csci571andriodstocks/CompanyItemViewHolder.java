@@ -14,7 +14,8 @@ public class CompanyItemViewHolder extends RecyclerView.ViewHolder {
     final TextView ticker;
     final TextView shares_or_name;
     final TextView change;
-    final TextView price;
+    final TextView last;
+
 
     CompanyItemViewHolder(@NonNull View view) {
         super(view);
@@ -24,6 +25,6 @@ public class CompanyItemViewHolder extends RecyclerView.ViewHolder {
         ticker = view.findViewById(R.id.company_ticker);
         shares_or_name = view.findViewById(R.id.company_name_or_shares);
         change = view.findViewById(R.id.company_price_change);
-        price = view.findViewById(R.id.company_price);
+        last = view.findViewById(R.id.company_price);
     }
 }

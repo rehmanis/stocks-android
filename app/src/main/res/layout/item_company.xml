@@ -14,7 +14,9 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="2dp"
-        android:background="#c0c0c0"/>
+        android:background="#c0c0c0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/company_ticker"
@@ -25,6 +27,7 @@
         android:layout_marginTop="8dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:textStyle="bold"
         tools:text="AAPL" />
 
     <TextView
@@ -33,6 +36,7 @@
         android:layout_height="20dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
+        android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/company_ticker"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="9999.99" />
@@ -43,7 +47,7 @@
         android:layout_height="15dp"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/company_ticker"
         tools:text="Company name or shares" />
@@ -52,7 +56,7 @@
         android:id="@+id/company_price_change"
         android:layout_width="wrap_content"
         android:layout_height="15dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,7 +67,7 @@
         android:id="@+id/img_change_arrow"
         android:layout_width="20dp"
         android:layout_height="15dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         app:layout_constraintEnd_toStartOf="@+id/company_price_change"

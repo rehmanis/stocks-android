@@ -13,6 +13,7 @@ public class SearchResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.i("HERE", "herrrrrrrrrrrrrrrrrrrrrrrrrrrrr ");
         handleIntent(getIntent());
     }
 
@@ -25,4 +26,12 @@ public class SearchResultsActivity extends AppCompatActivity {
             Log.i("SEARCH", "use entered the search " + query);
         }
     }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
 }
