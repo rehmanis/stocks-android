@@ -34,7 +34,7 @@ public class Company {
         this.arrow = 0;
     }
 
-    public Company(String name, String ticker, String shares, String  last, String prevClose,
+    public Company(String name, String ticker, String shares, String last, String prevClose,
                    String name_or_shares, Context ctx) {
         this.name = name;
         this.ticker = ticker;

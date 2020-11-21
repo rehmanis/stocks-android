@@ -11,12 +11,13 @@
     android:paddingBottom="1dp">
 
     <View
+        android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="2dp"
         android:background="#c0c0c0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/company_ticker"
@@ -35,10 +36,10 @@
         android:layout_width="wrap_content"
         android:layout_height="20dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginRight="32dp"
         android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/company_ticker"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/button"
         tools:text="9999.99" />
 
     <TextView
@@ -56,10 +57,9 @@
         android:id="@+id/company_price_change"
         android:layout_width="wrap_content"
         android:layout_height="15dp"
-        android:layout_marginTop="0dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginRight="4dp"
+        app:layout_constraintEnd_toStartOf="@+id/button"
         app:layout_constraintTop_toBottomOf="@+id/company_price"
         tools:text="99.99" />
 
@@ -67,13 +67,20 @@
         android:id="@+id/img_change_arrow"
         android:layout_width="20dp"
         android:layout_height="15dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginRight="4dp"
         app:layout_constraintEnd_toStartOf="@+id/company_price_change"
         app:layout_constraintTop_toBottomOf="@+id/company_price" />
 
-
+    <Button
+        android:id="@+id/button"
+        android:layout_width="27dp"
+        android:layout_height="28dp"
+        android:background="@drawable/ic_baseline_keyboard_arrow_right_24"
+        android:text=""
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/view" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
