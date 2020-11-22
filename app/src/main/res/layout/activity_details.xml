@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".DetailsActivity">
 
+
+
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -16,12 +18,15 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp">
+                android:layout_height="55dp"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:background="@color/white">
 
                 <TextView
                     android:id="@+id/detail_ticker"
@@ -76,10 +81,144 @@
                     app:layout_constraintEnd_toEndOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <WebView
-                android:id="@+id/webView_chart"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="350dp" />
+                android:layout_height="350dp">
+
+                <WebView
+                    android:id="@+id/webView_chart"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@color/white">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="0dp"
+                    android:text="Portfolio"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/trade_btn"
+                    android:layout_width="101dp"
+                    android:layout_height="29dp"
+                    android:layout_marginEnd="36dp"
+                    android:layout_marginRight="36dp"
+                    android:layout_marginBottom="4dp"
+                    android:text="Trade"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:background="@drawable/rounded_corners"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    tools:ignore="RtlCompat" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="210dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginBottom="4dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <TextView
+                        android:id="@+id/tvDetails_shares"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:gravity="center"
+                        android:text="TextView"
+                        app:layout_constraintBottom_toTopOf="@+id/tvMarket_value"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tvMarket_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:gravity="center"
+                        android:text="Start Trading!"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:background="@color/white">
+                <TextView
+                    android:id="@+id/tvDetails_stats"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginTop="0dp"
+                    android:text="Stats"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <GridView
+                    android:paddingLeft="10dp"
+                    android:id="@+id/grid_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:numColumns="3"
+                    android:verticalSpacing="20dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvDetails_stats" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:background="@color/white"
+                android:id="@+id/tvDetails_about"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="About"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:textColor="@color/black"/>
+
+            <TextView
+                android:background="@color/white"
+                android:paddingLeft="8dp"
+                android:id="@+id/tvDetails_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textColor="@color/black"/>
+
+
         </LinearLayout>
 
 

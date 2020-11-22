@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.GridView;
 import android.widget.TextView;
 
 import com.android.volley.Response;
@@ -19,6 +20,7 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -33,11 +35,15 @@ public class DetailsActivity extends AppCompatActivity {
     public static final String CHART_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/chart/historical/";
 
     private Map<String, String> myFavourites;
+    private Map<String, Integer> myPortfolio;
     private boolean isFavourites;
     private String ticker;
     private String name;
     private Context ctx;
     private WebView wv;
+    private GridView statGrid;
+    private String[] stats;
+    CustomGridAdapter customGridAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +53,15 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         ticker = intent.getStringExtra(MainActivity.EXTRA_TICKER);
         ctx = this;
-
         wv = (WebView) findViewById(R.id.webView_chart);
         wv.loadUrl("file:///android_asset/charts.html");
         wv.getSettings().setJavaScriptEnabled(true);
+
+        statGrid = (GridView) findViewById(R.id.grid_view); // init GridView
+        stats = new String[7];
+        // Create an object of CustomAdapter and set Adapter to GirdView
+        customGridAdapter = new CustomGridAdapter(this, stats);
+        statGrid.setAdapter(customGridAdapter);
 
 
         wv.setWebViewClient(new WebViewClient() {
@@ -67,6 +78,19 @@ public class DetailsActivity extends AppCompatActivity {
 
         makeApiCallPrice(ticker);
         makeApiCallSummary(ticker);
+
+//        myPortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+//        tvShares = findViewById(R.id.tvDetails_shares);
+//        TextView tvMarketValue = findViewById(R.id.tvMarket_value);
+//        tvShares.setText("You have 0 shares of " + ticker);
+//
+//        if (myPortfolio.containsKey(ticker)){
+//
+//            int shares = myPortfolio.get(ticker);
+//
+//            tvShares.setText("Shares owned: " + shares);
+//            tvMarketValue.setText("Market Value: "  );
+//        }
 
     }
 
@@ -135,10 +159,18 @@ public class DetailsActivity extends AppCompatActivity {
                         JSONObject row = array.getJSONObject(i);
                         String last = row.getString("last");
                         String prevClose = row.getString("prevClose");
+                        String low = row.getString("low");
+                        String bidPrice = row.getString("bidPrice");
+                        String openPrice = row.getString("open");
+                        String mid = row.getString("mid");
+                        String high = row.getString("high");
+                        String volume = row.getString("volume");
 
                         TextView tvTicker = (TextView) findViewById(R.id.detail_ticker);
                         TextView tvLast = (TextView) findViewById(R.id.detail_last);
                         TextView tvChange = (TextView) findViewById(R.id.detail_change);
+                        TextView tvMarketValue = findViewById(R.id.tvMarket_value);
+                        TextView tvShares = findViewById(R.id.tvDetails_shares);
 
                         Locale locale = new Locale("en", "US");
                         NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
@@ -151,11 +183,36 @@ public class DetailsActivity extends AppCompatActivity {
                         tvChange.setText(fmt.format(company.change));
                         tvChange.setTextColor(company.changeColor);
                         tvLast.setText(company.last);
+                        tvShares.setText("You have 0 shares of " + ticker);
 
+                        myPortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+
+                        if (myPortfolio.containsKey(ticker)){
+
+                            int shares = myPortfolio.get(ticker);
+                            double val = shares * Double.parseDouble(last);
+                            tvShares.setText("Shares owned: " + shares);
+                            tvMarketValue.setText("Market Value: " + fmt.format(val));
+                        }
+
+
+                        String[] newSats = {
+                                "Current Price: " + last,
+                                "Low: " + low,
+                                "Bid Price: " + bidPrice,
+                                "Open Price: " + openPrice,
+                                "Mid: " + mid,
+                                "High: " + high,
+                                "Volume: " + volume
+                        };
+
+                        customGridAdapter.setData(newSats);
+                        customGridAdapter.notifyDataSetChanged();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
 
             }
         }, new Response.ErrorListener() {
@@ -182,7 +239,10 @@ public class DetailsActivity extends AppCompatActivity {
                         name = row.getString("name");;
 
                         TextView tvCompanyName = (TextView) findViewById(R.id.detail_company_name);
+                        TextView tvDescription = (TextView) findViewById(R.id.tvDetails_desc);
                         tvCompanyName.setText(name);
+                        tvDescription.setText(description);
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

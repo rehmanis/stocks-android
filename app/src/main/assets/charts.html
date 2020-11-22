@@ -7,12 +7,9 @@
         <!-- meta tags -->
         <meta charset="utf-8">
         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no'>
-<!--        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">-->
-
 
         <!-- Highcharts stocks JS Module -->
         <script src="https://code.highcharts.com/stock/highstock.js"></script>
-        <script src="https://code.highcharts.com/stock/modules/data.js"></script>
         <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
         <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
         <script src="https://code.highcharts.com/stock/indicators/volume-by-price.js"></script>
@@ -23,16 +20,14 @@
 
     <body>
 
-        <div id="chart-container" class="chart" style="width: 100%; height: 300px; display: block;"></div>
+        <div id="chart-container" class="chart" style="width: 100%; height: 350px; display: block;"></div>
 
         <script>
 
             function createChart(ticker, data){
 
-
                 data = JSON.parse(data);
-
-
+                
                 // split the data set into ohlc and volume
                 var ohlc = [],
                     volume = [],
