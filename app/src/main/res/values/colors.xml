@@ -12,5 +12,6 @@
     <color name="positive">#319C5E</color>
     <color name="negative">#9B4049</color>
     <color name="section_header">#e0e3e5</color>
+    <color name="show_more">#88000000</color>
 
 </resources>

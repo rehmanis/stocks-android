@@ -1,10 +1,12 @@
 package com.example.csci571andriodstocks;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,7 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Response;
@@ -20,11 +24,8 @@ import com.android.volley.VolleyError;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ public class DetailsActivity extends AppCompatActivity {
     public static final String PRICE_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/price/";
     public static final String DETAIL_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/detail/";
     public static final String CHART_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/chart/historical/";
+    public static final int TOT_API_CALLS = 2;
 
     private Map<String, String> myFavourites;
     private Map<String, Integer> myPortfolio;
@@ -43,7 +45,14 @@ public class DetailsActivity extends AppCompatActivity {
     private WebView wv;
     private GridView statGrid;
     private String[] stats;
+    private ProgressBar spinner;
+    private int numApiCalls;
+    private boolean isApiFailed;
     CustomGridAdapter customGridAdapter;
+    private NestedScrollView nestedScrollView;
+//    private String descBtnTxt = "Show more";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,16 +62,20 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = getIntent();
         ticker = intent.getStringExtra(MainActivity.EXTRA_TICKER);
         ctx = this;
+        numApiCalls = 0;
+        isApiFailed = false;
         wv = (WebView) findViewById(R.id.webView_chart);
         wv.loadUrl("file:///android_asset/charts.html");
         wv.getSettings().setJavaScriptEnabled(true);
 
         statGrid = (GridView) findViewById(R.id.grid_view); // init GridView
+        spinner = (ProgressBar)findViewById(R.id.progressbar);
         stats = new String[7];
         // Create an object of CustomAdapter and set Adapter to GirdView
         customGridAdapter = new CustomGridAdapter(this, stats);
         statGrid.setAdapter(customGridAdapter);
 
+        nestedScrollView = (NestedScrollView) findViewById(R.id.details_screen);
 
         wv.setWebViewClient(new WebViewClient() {
             @Override
@@ -211,13 +224,27 @@ public class DetailsActivity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    isApiFailed = true;
                 }
 
+                numApiCalls++;
+
+                if (isApiFailed){
+                    numApiCalls = 0;
+                    // display an error message or do some error handling
+
+                } else if (numApiCalls == TOT_API_CALLS){
+                    numApiCalls = 0;
+                    spinner.setVisibility(View.GONE);
+                    nestedScrollView.setVisibility(View.VISIBLE);
+                    isEllipses();
+                }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                isApiFailed = true;
                 Log.i("error", "error in search http " + error);
             }
         });
@@ -243,18 +270,77 @@ public class DetailsActivity extends AppCompatActivity {
                         tvCompanyName.setText(name);
                         tvDescription.setText(description);
 
+
+
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+
+                numApiCalls++;
+
+                if (isApiFailed){
+                    numApiCalls = 0;
+                    // display an error message or do some error handling
+
+                } else if (numApiCalls == TOT_API_CALLS){
+                    numApiCalls = 0;
+                    spinner.setVisibility(View.GONE);
+                    nestedScrollView.setVisibility(View.VISIBLE);
+                    isEllipses();
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                isApiFailed = true;
                 Log.i("error", "error in search http " + error);
             }
         });
+    }
+
+    public void toggleDescription(View view){
+
+        TextView tvDescription = (TextView) findViewById(R.id.tvDetails_desc);
+        Button toggleDescBtn = (Button) findViewById(R.id.btn_desc);
+
+        CharSequence btnDescTxt = toggleDescBtn.getText();
+
+        Log.d("button", ".........button pressed text: " + btnDescTxt);
+
+        if (btnDescTxt.equals("Show more...")){
+            toggleDescBtn.setText("Show less");
+            tvDescription.setMaxLines(Integer.MAX_VALUE);
+            tvDescription.setEllipsize(null);
+
+        }else{
+            toggleDescBtn.setText("Show more...");
+            tvDescription.setMaxLines(2);
+            tvDescription.setEllipsize(TextUtils.TruncateAt.END);
+        }
+    }
+
+    public void isEllipses(){
+
+        TextView tvDescription = (TextView) findViewById(R.id.tvDetails_desc);
+        Button toggleDescBtn = (Button) findViewById(R.id.btn_desc);
+
+        tvDescription.post(new Runnable() {
+            @Override
+            public void run() {
+                int lines = tvDescription.getLineCount();
+                if (lines > 2) {
+                    //do something
+                    tvDescription.setMaxLines(2);
+                    tvDescription.setEllipsize(TextUtils.TruncateAt.END);
+                    toggleDescBtn.setVisibility(View.VISIBLE);
+                    Log.d("LINES", "..........There are " + lines);
+                }
+            }
+        });
+
     }
 
 
