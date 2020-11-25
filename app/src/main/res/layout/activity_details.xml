@@ -211,12 +211,18 @@
 
             <TextView
                 android:background="@color/white"
-                android:paddingLeft="8dp"
+                android:paddingLeft="4dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="8dp"
                 android:id="@+id/tvDetails_desc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="TextView"
+                android:scrollHorizontally="true"
+                android:ellipsize="end"
+                android:maxLines="2"
                 android:textColor="@color/black"/>
+
 
 
         </LinearLayout>
