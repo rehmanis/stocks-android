@@ -34,7 +34,7 @@ public class News {
         Instant instant = Instant.parse(timestamp);
         long diff = currentDate.getTime() - instant.toEpochMilli();
         long days = (diff / (60*60*24*1000));
-        String lastAgoTxt = "days ago";
+        String lastAgoTxt = " days ago";
 
         if (days <= 0){
             days = (diff / (60*60*1000));

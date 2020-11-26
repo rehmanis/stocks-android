@@ -70,15 +70,35 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         this.ctx = ctx;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        // Just as an example, return 0 or 2 depending on position
+        // Note that unlike in ListView adapters, types don't have to be contiguous
+        if (position == 0){
+            return 0;
+        }
+
+        return 1;
+    }
+
+
     // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
+
         View view = LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.news_item, viewGroup, false);
 
+        if (viewType == 0){
+            view = LayoutInflater.from(viewGroup.getContext())
+                    .inflate(R.layout.first_news, viewGroup, false);
+        }
+
+
         return new ViewHolder(view);
     }
+
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
@@ -99,7 +119,12 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         ImageView ivNewsImg = (ImageView)  viewHolder.getIvNewsImg();
 //        Picasso.with(ctx).load(news.img).into(ivNewsImg);
 //        Picasso.with(ctx).load(news.img).resize(0, 150).into(ivNewsImg);
-        Picasso.with(ctx).load(news.img).resize(400, 400).into(ivNewsImg);
+        if (viewHolder.getItemViewType() != 0){
+            Picasso.with(ctx).load(news.img).resize(400, 400).into(ivNewsImg);
+        }else{
+            Picasso.with(ctx).load(news.img).resize(1500, 0).into(ivNewsImg);
+        }
+
 
     }
 
