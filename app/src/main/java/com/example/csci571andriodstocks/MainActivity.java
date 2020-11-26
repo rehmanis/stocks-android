@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
     private Context ctx;
 
 
+
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
 

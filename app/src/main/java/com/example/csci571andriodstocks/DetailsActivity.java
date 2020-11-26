@@ -2,6 +2,8 @@ package com.example.csci571andriodstocks;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,15 +28,20 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 public class DetailsActivity extends AppCompatActivity {
 
     public static final String PRICE_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/price/";
     public static final String DETAIL_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/detail/";
     public static final String CHART_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/chart/historical/";
-    public static final int TOT_API_CALLS = 2;
+    public static final String NEWS_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/news/";
+    public static final int TOT_API_CALLS = 3;
 
     private Map<String, String> myFavourites;
     private Map<String, Integer> myPortfolio;
@@ -44,12 +51,15 @@ public class DetailsActivity extends AppCompatActivity {
     private Context ctx;
     private WebView wv;
     private GridView statGrid;
+    private RecyclerView recyclerViewNews;
     private String[] stats;
     private ProgressBar spinner;
     private int numApiCalls;
     private boolean isApiFailed;
-    CustomGridAdapter customGridAdapter;
+    private CustomGridAdapter customGridAdapter;
+    private CustomNewsAdapter customNewsAdapter;
     private NestedScrollView nestedScrollView;
+    private List<News> newsList;
 //    private String descBtnTxt = "Show more";
 
 
@@ -76,6 +86,13 @@ public class DetailsActivity extends AppCompatActivity {
         statGrid.setAdapter(customGridAdapter);
 
         nestedScrollView = (NestedScrollView) findViewById(R.id.details_screen);
+        recyclerViewNews = (RecyclerView) findViewById(R.id.rvNews);
+        recyclerViewNews.setLayoutManager(new LinearLayoutManager(this));
+
+        newsList = new ArrayList<>();
+        customNewsAdapter = new CustomNewsAdapter(newsList, this);
+        recyclerViewNews.setAdapter(customNewsAdapter);
+
 
         wv.setWebViewClient(new WebViewClient() {
             @Override
@@ -91,19 +108,8 @@ public class DetailsActivity extends AppCompatActivity {
 
         makeApiCallPrice(ticker);
         makeApiCallSummary(ticker);
+        makeApiCallNews(ticker);
 
-//        myPortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
-//        tvShares = findViewById(R.id.tvDetails_shares);
-//        TextView tvMarketValue = findViewById(R.id.tvMarket_value);
-//        tvShares.setText("You have 0 shares of " + ticker);
-//
-//        if (myPortfolio.containsKey(ticker)){
-//
-//            int shares = myPortfolio.get(ticker);
-//
-//            tvShares.setText("Shares owned: " + shares);
-//            tvMarketValue.setText("Market Value: "  );
-//        }
 
     }
 
@@ -270,9 +276,6 @@ public class DetailsActivity extends AppCompatActivity {
                         tvCompanyName.setText(name);
                         tvDescription.setText(description);
 
-
-
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -343,6 +346,63 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    private void makeApiCallNews(String ticker) {
+
+        ApiCall.make(this, ticker, NEWS_URL, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //parsing logic, please change it as per your requirement
+                List<News> tempNewsList = new ArrayList<>();
+
+                try {
+                    JSONObject responseObject = new JSONObject(response);
+                    JSONArray array = responseObject.getJSONArray("results");
+                    Log.i("length:", "len: " + array.length());
+                    for (int i = 0; i < array.length(); i++) {
+                        JSONObject row = array.getJSONObject(i);
+                        String url = row.getString("url");
+                        String title = row.getString("title");
+                        String src = row.getString("source");
+                        String urlToImg = row.getString("urlToImage");
+                        String timestamp = row.getString("publishedAt");
+
+
+                        News newsItem = new News(src, urlToImg, title, timestamp);
+                        tempNewsList.add(newsItem);
+
+                    }
+                } catch (Exception e) {
+                    isApiFailed = true;
+                    e.printStackTrace();
+                }
+
+                newsList.clear();
+                newsList.addAll(tempNewsList);
+                customGridAdapter.notifyDataSetChanged();
+
+                numApiCalls++;
+
+                if (isApiFailed){
+                    numApiCalls = 0;
+                    // display an error message or do some error handling
+
+                } else if (numApiCalls == TOT_API_CALLS){
+                    numApiCalls = 0;
+                    spinner.setVisibility(View.GONE);
+                    nestedScrollView.setVisibility(View.VISIBLE);
+                    isEllipses();
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                isApiFailed = true;
+                Log.i("error", "error in search http " + error);
+            }
+        });
+    }
+
 
     private void makeApiCallChart(String ticker) {
 
@@ -368,5 +428,7 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
 }
