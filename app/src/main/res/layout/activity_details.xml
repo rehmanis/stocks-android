@@ -261,6 +261,20 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+            <TextView
+                android:background="@color/white"
+                android:id="@+id/tv_details_news"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="News"
+                android:textStyle="bold"
+                android:textSize="18dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:textColor="@color/black"/>
+
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvNews"
                 android:layout_width="match_parent"

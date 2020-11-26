@@ -23,8 +23,10 @@ public class News {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public News (String src, String img, String title, String timestamp){
 
+        String urlHttps = img.replaceFirst("(?i)^http://", "https://");
+
         this.src = src;
-        this.img = img;
+        this.img = urlHttps;
         this.title = title;
 
 //        Date date = new Date(timestamp);
@@ -47,7 +49,7 @@ public class News {
 
         this.lastUpdated = days + lastAgoTxt;
 
-        Log.e("TEST" , currentDate + " - " + instant + " - " + this.lastUpdated);
+        Log.i("TEST" , currentDate + " - " + instant + " - " + this.lastUpdated);
 
 //        try {
 ////            final SimpleDateFormat df = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);

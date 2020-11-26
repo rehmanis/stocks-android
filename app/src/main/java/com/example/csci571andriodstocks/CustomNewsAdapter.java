@@ -2,6 +2,7 @@ package com.example.csci571andriodstocks;
 
 import android.content.Context;
 import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,7 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         public TextView getTvNewsTitle() {
             return tvNewsTitle;
         }
+
         public ImageView getIvNewsImg() {
             return ivNewsImg;
         }
@@ -90,10 +92,14 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         viewHolder.getTvNewsTitle().setText(news.title);
         viewHolder.getTvNewsSrc().setText(news.src);
 
+        if (position >=0 ){
+            Log.e("NEWS", "urlToImg: " + news.img + "\ntitle: " + news.title);
+        }
+
         ImageView ivNewsImg = (ImageView)  viewHolder.getIvNewsImg();
 //        Picasso.with(ctx).load(news.img).into(ivNewsImg);
 //        Picasso.with(ctx).load(news.img).resize(0, 150).into(ivNewsImg);
-        Picasso.with(ctx).load(news.img).resize(500, 500).into(ivNewsImg);
+        Picasso.with(ctx).load(news.img).resize(400, 400).into(ivNewsImg);
 
     }
 

@@ -1,5 +1,6 @@
 package com.example.csci571andriodstocks;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -349,6 +351,7 @@ public class DetailsActivity extends AppCompatActivity {
     private void makeApiCallNews(String ticker) {
 
         ApiCall.make(this, ticker, NEWS_URL, new Response.Listener<String>() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onResponse(String response) {
                 //parsing logic, please change it as per your requirement
@@ -365,6 +368,11 @@ public class DetailsActivity extends AppCompatActivity {
                         String src = row.getString("source");
                         String urlToImg = row.getString("urlToImage");
                         String timestamp = row.getString("publishedAt");
+
+                        if (i == 10){
+                            Log.i("NEWS", "urlToImg: " + urlToImg + "\ntitle: " + title);
+
+                        }
 
 
                         News newsItem = new News(src, urlToImg, title, timestamp);

@@ -11,12 +11,12 @@
 
 
     <TextView
-        android:id="@+id/tv_news_title"
-        android:layout_width="246dp"
+        android:id="@+id/tv_news_title_first"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="16dp"
         android:ellipsize="end"
         android:maxLines="5"
         android:scrollHorizontally="true"
@@ -24,31 +24,31 @@
         android:textColor="@color/black"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_news_src" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_news_src_first" />
 
     <TextView
-        android:id="@+id/tv_news_last_updated"
+        android:id="@+id/tv_news_last_updated_first"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:text="TextView"
-        app:layout_constraintStart_toEndOf="@+id/tv_news_src"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/tv_news_src_first"
+        app:layout_constraintTop_toBottomOf="@+id/card_view_first" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+        android:id="@+id/card_view_first"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:elevation="10dp"
         app:cardCornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/iv_news_img"
-            android:layout_width="wrap_content"
+            android:id="@+id/iv_news_img_first"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -57,15 +57,15 @@
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/tv_news_src"
-        android:layout_width="108dp"
-        android:layout_height="20dp"
+        android:id="@+id/tv_news_src_first"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:text="TextView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/card_view_first" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
