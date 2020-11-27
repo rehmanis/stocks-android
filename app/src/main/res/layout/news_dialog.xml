@@ -26,11 +26,16 @@
             android:layout_height="wrap_content"
             android:textColor="@color/black"
             android:textStyle="bold"
+            android:paddingBottom="4dp"
             android:textSize="16dp"
             android:paddingLeft="4dp"
             android:text="TextView" />
 
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#FF0000FF" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -38,23 +43,30 @@
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/imageButton5"
+                android:id="@+id/btn_twitter"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter"
-                android:padding="12dp"
+                android:padding="6dp"
+                android:background="@color/white"
                 android:src="@drawable/ic_twitter_logo" />
 
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#FF0000FF" />
+
             <ImageButton
-                android:id="@+id/imageButton4"
+                android:id="@+id/btn_chrome"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="50dp"
                 android:layout_weight="1"
                 android:scaleType="fitCenter"
                 android:adjustViewBounds="true"
-                android:padding="12dp"
+                android:padding="6dp"
+                android:background="@color/white"
                 android:src="@drawable/ic_chrome" />
 
 

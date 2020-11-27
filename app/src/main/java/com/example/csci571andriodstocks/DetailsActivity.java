@@ -22,6 +22,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -97,34 +98,37 @@ public class DetailsActivity extends AppCompatActivity {
 
         newsList = new ArrayList<>();
         customNewsAdapter = new CustomNewsAdapter(newsList, this,
-                new CustomNewsAdapter.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(News newsItem, int position) {
-                        Uri uri = Uri.parse(newsItem.url); // missing 'http://' will cause crashed
-                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                        startActivity(intent);
-                        Log.e("CLICK_NEWS", "news item clicked at " + position);
-                    }
+                (CustomNewsAdapter.OnItemClickListener) (newsItem, position) -> {
+//                    Uri uri = Uri.parse(newsItem.url); // missing 'http://' will cause crashed
+//                    Intent intent1 = new Intent(Intent.ACTION_VIEW, uri);
+//                    startActivity(intent1);
+                    openChrome(newsItem.url);
+                    Log.e("CLICK_NEWS", "news item clicked at " + position);
                 },
 
-                new CustomNewsAdapter.OnItemLongClickListener() {
-                    @Override
-                    public void onItemLongClick(News newsItem, int position) {
+                (CustomNewsAdapter.OnItemLongClickListener) (newsItem, position) -> {
 
-                        final Dialog dialog = new Dialog(ctx);
-                        dialog.setContentView(R.layout.news_dialog);
+                    final Dialog dialog = new Dialog(ctx);
+                    dialog.setContentView(R.layout.news_dialog);
 
-                        TextView tvNewsTitle = (TextView) dialog.findViewById(R.id.tvDialog_news_title);
-                        ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
+                    TextView tvNewsTitle = (TextView) dialog.findViewById(R.id.tvDialog_news_title);
+                    ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
+                    ImageButton btnTwitter = (ImageButton) dialog.findViewById(R.id.btn_twitter);
+                    ImageButton btnChrome = (ImageButton) dialog.findViewById(R.id.btn_chrome);
 
-                        tvNewsTitle.setText(newsItem.title);
-//                        ivNewsImg.setImageURI(Uri.parse(newsItem.img));
-                        Picasso.with(ctx).load(newsItem.img)
-                                .into(ivNewsImg);
+                    tvNewsTitle.setText(newsItem.title);
+                    Picasso.with(ctx).load(newsItem.img)
+                            .into(ivNewsImg);
 
-                        Log.e("LONGCLICK_NEWS", "news item clicked at " + position);
-                        dialog.show();
-                    }
+                    btnChrome.setOnClickListener(v -> openChrome(newsItem.url));
+                    btnTwitter.setOnClickListener(v -> {
+                        String url = "https://twitter.com/intent/tweet?text=Check out this link:" +
+                                "&url=" + newsItem.url + "&hashtags=CSCI571StockApp";
+                        openChrome(url);
+                    });
+
+                    dialog.show();
+                    Log.e("LONGCLICK_NEWS", "news item clicked at " + position);
                 }
         );
         recyclerViewNews.setAdapter(customNewsAdapter);
@@ -198,6 +202,8 @@ public class DetailsActivity extends AppCompatActivity {
         }
         return true;
     }
+
+
 
 
     private void makeApiCallPrice(String ticker) {
@@ -338,6 +344,13 @@ public class DetailsActivity extends AppCompatActivity {
                 Log.i("error", "error in search http " + error);
             }
         });
+    }
+
+    private void openChrome(String url){
+        Uri uri = Uri.parse(url); // missing 'http://' will cause crashed
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
+
     }
 
     public void toggleDescription(View view){
