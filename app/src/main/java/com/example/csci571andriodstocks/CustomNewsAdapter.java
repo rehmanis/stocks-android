@@ -17,8 +17,21 @@ import java.util.List;
 
 public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.ViewHolder> {
 
+    public interface OnItemClickListener {
+        void onItemClick(News newsItem, int position);
+    }
+
+    public interface OnItemLongClickListener {
+        void onItemLongClick(News newsItem, int position);
+    }
+
+
+
 //    private String[] localDataSet;
     private final List<News> newsList;
+    private final OnItemClickListener clickListener;
+    private final OnItemLongClickListener longClickListener;
+
     private final Context ctx;
 
     /**
@@ -30,11 +43,12 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         private final ImageView ivNewsImg;
         private final TextView tvLastUpdated;
         private final TextView tvNewsTitle;
+        final View rootView;
 
         public ViewHolder(View view) {
             super(view);
             // Define click listener for the ViewHolder's View
-
+            rootView = view;
             tvNewsSrc = (TextView) view.findViewById(R.id.tv_news_src);
             ivNewsImg = (ImageView) view.findViewById(R.id.iv_news_img);
             tvNewsTitle = (TextView) view.findViewById(R.id.tv_news_title);
@@ -64,10 +78,13 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
      * @param newsList List<News> containing the data to populate views to be used
      * by RecyclerView.
      */
-    public CustomNewsAdapter(List<News> newsList, Context ctx) {
+    public CustomNewsAdapter(List<News> newsList, Context ctx, OnItemClickListener clickListener,
+                             OnItemLongClickListener longClickListener) {
 
         this.newsList = newsList;
         this.ctx = ctx;
+        this.clickListener = clickListener;
+        this.longClickListener = longClickListener;
     }
 
     @Override
@@ -117,13 +134,21 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         }
 
         ImageView ivNewsImg = (ImageView)  viewHolder.getIvNewsImg();
-//        Picasso.with(ctx).load(news.img).into(ivNewsImg);
-//        Picasso.with(ctx).load(news.img).resize(0, 150).into(ivNewsImg);
+
         if (viewHolder.getItemViewType() != 0){
             Picasso.with(ctx).load(news.img).resize(400, 400).into(ivNewsImg);
         }else{
             Picasso.with(ctx).load(news.img).resize(1500, 0).into(ivNewsImg);
         }
+
+        viewHolder.rootView.setOnClickListener(v ->
+                clickListener.onItemClick(news, viewHolder.getAdapterPosition()));
+
+        viewHolder.rootView.setOnLongClickListener(v -> {
+
+            longClickListener.onItemLongClick(news, viewHolder.getAdapterPosition());
+            return true;
+        });
 
 
     }

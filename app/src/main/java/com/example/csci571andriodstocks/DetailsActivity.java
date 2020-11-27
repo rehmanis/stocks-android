@@ -6,8 +6,10 @@ import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -20,11 +22,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -92,7 +96,37 @@ public class DetailsActivity extends AppCompatActivity {
         recyclerViewNews.setLayoutManager(new LinearLayoutManager(this));
 
         newsList = new ArrayList<>();
-        customNewsAdapter = new CustomNewsAdapter(newsList, this);
+        customNewsAdapter = new CustomNewsAdapter(newsList, this,
+                new CustomNewsAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(News newsItem, int position) {
+                        Uri uri = Uri.parse(newsItem.url); // missing 'http://' will cause crashed
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                        Log.e("CLICK_NEWS", "news item clicked at " + position);
+                    }
+                },
+
+                new CustomNewsAdapter.OnItemLongClickListener() {
+                    @Override
+                    public void onItemLongClick(News newsItem, int position) {
+
+                        final Dialog dialog = new Dialog(ctx);
+                        dialog.setContentView(R.layout.news_dialog);
+
+                        TextView tvNewsTitle = (TextView) dialog.findViewById(R.id.tvDialog_news_title);
+                        ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
+
+                        tvNewsTitle.setText(newsItem.title);
+//                        ivNewsImg.setImageURI(Uri.parse(newsItem.img));
+                        Picasso.with(ctx).load(newsItem.img)
+                                .into(ivNewsImg);
+
+                        Log.e("LONGCLICK_NEWS", "news item clicked at " + position);
+                        dialog.show();
+                    }
+                }
+        );
         recyclerViewNews.setAdapter(customNewsAdapter);
 
 
@@ -375,7 +409,7 @@ public class DetailsActivity extends AppCompatActivity {
                         }
 
 
-                        News newsItem = new News(src, urlToImg, title, timestamp);
+                        News newsItem = new News(src, urlToImg, title, timestamp, url);
                         tempNewsList.add(newsItem);
 
                     }

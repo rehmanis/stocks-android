@@ -19,15 +19,18 @@ public class News {
     final String img;
     final String lastUpdated;
     final String title;
+    final String url;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public News (String src, String img, String title, String timestamp){
+    public News (String src, String img, String title, String timestamp, String url){
 
+        // this is need since new android accepts only https calls
         String urlHttps = img.replaceFirst("(?i)^http://", "https://");
 
         this.src = src;
         this.img = urlHttps;
         this.title = title;
+        this.url = url;
 
 //        Date date = new Date(timestamp);
         Date currentDate = new Date();
