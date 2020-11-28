@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/tv_trading_title"
@@ -12,20 +12,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="TextView"
+        android:textStyle="bold"
+        android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/et_dialog_trading"
+        android:id="@+id/et_dialog_input_shares"
         android:layout_width="266dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginLeft="16dp"
         android:layout_marginTop="48dp"
         android:hint="0"
-        android:inputType="number"
+        android:inputType="numberDecimal"
         app:layout_constraintEnd_toStartOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_trading_title" />
@@ -37,7 +39,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:text="Shares"
-        app:layout_constraintBottom_toBottomOf="@+id/et_dialog_trading"
+        app:layout_constraintBottom_toBottomOf="@+id/et_dialog_input_shares"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
@@ -47,7 +49,7 @@
         android:layout_marginTop="16dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="@+id/textView3"
-        app:layout_constraintTop_toBottomOf="@+id/et_dialog_trading" />
+        app:layout_constraintTop_toBottomOf="@+id/et_dialog_input_shares" />
 
     <TextView
         android:id="@+id/tv_trading_cash"
@@ -58,7 +60,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.538"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_dialog_trading" />
+        app:layout_constraintTop_toBottomOf="@+id/et_dialog_input_shares" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -67,20 +69,32 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
         app:layout_constraintStart_toStartOf="parent"
+        android:paddingBottom="10dp"
         app:layout_constraintTop_toBottomOf="@+id/tv_trading_cash">
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Button"
-            android:textColor="#ffffff" />
+
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_buy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="Buy"
+            android:layout_marginRight="10dp"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:background="@drawable/rounded_corners"
+            tools:ignore="RtlCompat" />
+
+        <Button
+            android:id="@+id/btn_sell"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sell"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:background="@drawable/rounded_corners"
+            tools:ignore="RtlCompat"/>
     </LinearLayout>
 
 

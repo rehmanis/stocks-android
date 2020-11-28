@@ -12,7 +12,9 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +23,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,6 +58,7 @@ public class DetailsActivity extends AppCompatActivity {
     private boolean isFavourites;
     private String ticker;
     private String name;
+    private double lastPrice;
     private Context ctx;
     private WebView wv;
     private GridView statGrid;
@@ -67,6 +71,7 @@ public class DetailsActivity extends AppCompatActivity {
     private CustomNewsAdapter customNewsAdapter;
     private NestedScrollView nestedScrollView;
     private List<News> newsList;
+//    private Company currCompany;
 //    private String descBtnTxt = "Show more";
 
 
@@ -235,6 +240,7 @@ public class DetailsActivity extends AppCompatActivity {
                         NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 
                         Company company = new Company(name, ticker,"", last, prevClose, "", ctx);
+                        lastPrice = Double.parseDouble(company.last);
 
                         company.last = fmt.format(Double.parseDouble(company.last));
 
@@ -356,10 +362,56 @@ public class DetailsActivity extends AppCompatActivity {
         final Dialog dialog = new Dialog(ctx);
         dialog.setContentView(R.layout.trading_dialog);
 
-//        TextView tvNewsTitle = (TextView) dialog.findViewById(R.id.tvDialog_news_title);
+        TextView tvTitle = (TextView) dialog.findViewById(R.id.tv_trading_title);
+        TextView tvTotVal = (TextView) dialog.findViewById(R.id.tv_trading_tot_share_val);
+        TextView tvCompanyName = (TextView) findViewById(R.id.detail_company_name);
+        EditText etShareInput = (EditText) dialog.findViewById(R.id.et_dialog_input_shares);
+
+
+        tvTitle.setText(name + " shares");
+        tvTotVal.setText("0 x " + lastPrice + "/share = " + "$0.00");
 //        ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
 //        ImageButton btnTwitter = (ImageButton) dialog.findViewById(R.id.btn_twitter);
 //        ImageButton btnChrome = (ImageButton) dialog.findViewById(R.id.btn_chrome);
+
+        etShareInput.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+
+                double shares = 0;
+                double totVal;
+                String totValTxt;
+                Locale locale = new Locale("en", "US");
+                NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+                String lastStr;
+                String totValStr;
+
+                if (s.length() == 0){
+                    s = "0";
+                }else{
+                    shares = Double.parseDouble(s.toString());
+                }
+
+
+                totVal = lastPrice * shares;
+                lastStr = fmt.format(lastPrice);
+                totValStr = fmt.format(totVal);
+
+                totValTxt = s + " x " + lastStr + "/share = " + totValStr;
+                tvTotVal.setText(totValTxt);
+
+            }
+        });
 
         dialog.show();
 
