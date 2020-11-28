@@ -56,55 +56,59 @@ public class FavoriteSection extends Section {
         itemHolder.shares_or_name.setText(company.name);
         itemHolder.last.setText(company.last);
 
+        if (position == 0){
+            itemHolder.dividerLine.setVisibility(View.GONE);
+        }
+
         Log.i("VIEWCOLOR", "...........color" + company.changeColor);
 
 
-        itemHolder.rootView.setOnClickListener(v ->
-                clickListener.onItemRootViewClicked(this, itemHolder.getAdapterPosition())
+        itemHolder.btnGoTo.setOnClickListener(v ->
+                clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
         );
     }
 
-    @Override
-    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
-                                     final List<Object> payloads) {
+//    @Override
+//    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
+//                                     final List<Object> payloads) {
+//
+//        final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) holder;
+//
+//        Company company = list.get(position);
+//
+//        for (Object obj : payloads) {
+//            if (obj instanceof ItemPriceUpdate) {
+//                itemHolder.ticker.setText(company.ticker);
+//                itemHolder.shares_or_name.setText(company.name);
+//                itemHolder.imgItem.setImageResource(company.arrow);
+//                itemHolder.change.setText(String.valueOf(company.change));
+//                itemHolder.change.setTextColor(company.changeColor);
+//                itemHolder.last.setText(company.last);
+//            }
+//        }
+//
+//        itemHolder.btnGoTo.setOnClickListener(v ->
+//                clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
+//        );
+//    }
 
-        final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) holder;
-
-        Company company = list.get(position);
-
-        for (Object obj : payloads) {
-            if (obj instanceof ItemPriceUpdate) {
-                itemHolder.ticker.setText(company.ticker);
-                itemHolder.shares_or_name.setText(company.name);
-                itemHolder.imgItem.setImageResource(company.arrow);
-                itemHolder.change.setText(String.valueOf(company.change));
-                itemHolder.change.setTextColor(company.changeColor);
-                itemHolder.last.setText(company.last);
-            }
-        }
-
-        itemHolder.rootView.setOnClickListener(v ->
-                clickListener.onItemRootViewClicked(this, itemHolder.getAdapterPosition())
-        );
-    }
 
 
-
-    void updateItemPrice(final int index, final String ticker, final String name_shares, final String last,
-                         final double change, final @ColorInt int changeColor, final @DrawableRes int arrow) {
-        Company watchItem = list.get(index);
-
-        watchItem.ticker = ticker;
-        watchItem.name_or_shares = name_shares;
-        watchItem.last = last;
-        watchItem.change = change;
-        watchItem.changeColor = changeColor;
-        watchItem.arrow = arrow;
-
-    }
-
-    static class ItemPriceUpdate {
-    }
+//    void updateItemPrice(final int index, final String ticker, final String name_shares, final String last,
+//                         final double change, final @ColorInt int changeColor, final @DrawableRes int arrow) {
+//        Company watchItem = list.get(index);
+//
+//        watchItem.ticker = ticker;
+//        watchItem.name_or_shares = name_shares;
+//        watchItem.last = last;
+//        watchItem.change = change;
+//        watchItem.changeColor = changeColor;
+//        watchItem.arrow = arrow;
+//
+//    }
+//
+//    static class ItemPriceUpdate {
+//    }
 
     @Override
     public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
@@ -121,6 +125,6 @@ public class FavoriteSection extends Section {
 
     interface ClickListener {
 
-        void onItemRootViewClicked(@NonNull final FavoriteSection section, final int itemAdapterPosition);
+        void onItemRootViewClicked(Company company, final int itemAdapterPosition);
     }
 }

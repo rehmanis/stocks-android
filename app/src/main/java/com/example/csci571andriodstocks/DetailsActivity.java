@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -37,6 +39,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +74,9 @@ public class DetailsActivity extends AppCompatActivity {
     private CustomNewsAdapter customNewsAdapter;
     private NestedScrollView nestedScrollView;
     private List<News> newsList;
+    private String cashInHand;
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 //    private Company currCompany;
 //    private String descBtnTxt = "Show more";
 
@@ -86,9 +92,16 @@ public class DetailsActivity extends AppCompatActivity {
         ctx = this;
         numApiCalls = 0;
         isApiFailed = false;
+
+        sharedPreferences = getSharedPreferences(LocalStorage.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+        myPortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+
         wv = (WebView) findViewById(R.id.webView_chart);
         wv.loadUrl("file:///android_asset/charts.html");
         wv.getSettings().setJavaScriptEnabled(true);
+
+
 
         statGrid = (GridView) findViewById(R.id.grid_view); // init GridView
         spinner = (ProgressBar)findViewById(R.id.progressbar);
@@ -195,11 +208,14 @@ public class DetailsActivity extends AppCompatActivity {
                 isFavourites = false;
                 item.setIcon(R.drawable.ic_baseline_star_border_24);
                 myFavourites.remove(ticker);
-
+                Toast toast = Toast.makeText(this, ticker + " was removed from favourites", Toast.LENGTH_SHORT);
+                toast.show();
             } else{
                 isFavourites = true;
                 item.setIcon(R.drawable.ic_baseline_star_24);
                 myFavourites.put(ticker, name);
+                Toast toast = Toast.makeText(this, ticker + " was added to favourites", Toast.LENGTH_SHORT);
+                toast.show();
             }
             Log.i("added-removed", "favouroites......" + myFavourites);
             LocalStorage.setMap(LocalStorage.FAVOURITES, myFavourites);
@@ -357,6 +373,25 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    private boolean checkTradeError(double sharesInputed) {
+
+        if (sharesInputed <= 0){
+
+            Toast toast = Toast.makeText(this, "Cannot sell less than 0 shares", Toast.LENGTH_SHORT);
+            toast.show();
+            return false;
+        }
+
+        if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed){
+
+            Toast toast = Toast.makeText(this, "Not enough shares to sell", Toast.LENGTH_SHORT);
+            toast.show();
+            return false;
+        }
+
+        return true;
+    }
+
     public void openTradeDialog(View view) {
 
         final Dialog dialog = new Dialog(ctx);
@@ -364,15 +399,103 @@ public class DetailsActivity extends AppCompatActivity {
 
         TextView tvTitle = (TextView) dialog.findViewById(R.id.tv_trading_title);
         TextView tvTotVal = (TextView) dialog.findViewById(R.id.tv_trading_tot_share_val);
-        TextView tvCompanyName = (TextView) findViewById(R.id.detail_company_name);
+        TextView tvCashInHand = (TextView) dialog.findViewById(R.id.tv_trading_cash);
         EditText etShareInput = (EditText) dialog.findViewById(R.id.et_dialog_input_shares);
+        Button btnBuy = (Button) dialog.findViewById(R.id.btn_buy);
+        Button btnSell = (Button) dialog.findViewById(R.id.btn_sell);
 
 
-        tvTitle.setText(name + " shares");
+        cashInHand = sharedPreferences.getString(LocalStorage.CASH_IN_HAND, "20000.00");
+
+
+        tvTitle.setText("Trade " + name + " shares");
         tvTotVal.setText("0 x " + lastPrice + "/share = " + "$0.00");
-//        ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
-//        ImageButton btnTwitter = (ImageButton) dialog.findViewById(R.id.btn_twitter);
-//        ImageButton btnChrome = (ImageButton) dialog.findViewById(R.id.btn_chrome);
+        tvCashInHand.setText("$" + cashInHand + " available to buy " + ticker);
+
+
+        btnBuy.setOnClickListener(v -> {
+
+            double sharesInputed = 0;
+            double cashUsed;
+
+            if (etShareInput.getText().length() != 0){
+                try {
+                    sharesInputed = Double.parseDouble(String.valueOf(etShareInput.getText()));
+                } catch(NumberFormatException e){
+                    sharesInputed = 0;
+                    Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
+                    toast.show();
+                    return;
+                }
+            }
+
+            if (sharesInputed <= 0){
+
+                Toast toast = Toast.makeText(this, "Cannot buy less than 0 shares", Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+
+            if (lastPrice * sharesInputed > Double.parseDouble(cashInHand)){
+
+                Toast toast = Toast.makeText(this, "Not enough money to buy", Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+
+            if (myPortfolio.containsKey(ticker)){
+
+                double totShares = Double.parseDouble(myPortfolio.get(ticker)) + sharesInputed;
+                myPortfolio.put(ticker, String.valueOf(totShares));
+
+            }else{
+                myPortfolio.put(ticker, String.valueOf(sharesInputed));
+            }
+
+            LocalStorage.setMap(LocalStorage.PORTFOLIO, myPortfolio);
+            cashUsed = (lastPrice * sharesInputed);
+            DecimalFormat df = new DecimalFormat("####0.00");
+            cashInHand = df.format(Double.parseDouble(cashInHand) - cashUsed);
+            editor.putString(LocalStorage.CASH_IN_HAND, cashInHand);
+            editor.commit();
+            dialog.dismiss();
+
+        });
+
+        btnSell.setOnClickListener(v -> {
+
+            double sharesInputed = 0;
+
+            if (etShareInput.getText().length() != 0){
+
+                try {
+                    sharesInputed = Double.parseDouble(String.valueOf(etShareInput.getText()));
+                } catch(NumberFormatException e){
+                    Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
+                    toast.show();
+                    return;
+                }
+            }
+
+
+            if (sharesInputed <= 0){
+
+                Toast toast = Toast.makeText(this, "Cannot sell less than 0 shares", Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+
+            if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed){
+                Toast toast = Toast.makeText(this, "Not enough shares to sell", Toast.LENGTH_SHORT);
+                toast.show();
+                return;
+            }
+
+
+
+
+        });
+
 
         etShareInput.addTextChangedListener(new TextWatcher() {
 
@@ -399,7 +522,14 @@ public class DetailsActivity extends AppCompatActivity {
                 if (s.length() == 0){
                     s = "0";
                 }else{
-                    shares = Double.parseDouble(s.toString());
+
+                    try {
+                        shares = Double.parseDouble(s.toString());
+                    } catch(NumberFormatException e){
+                        shares = 0;
+                        Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
 
 
@@ -409,6 +539,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                 totValTxt = s + " x " + lastStr + "/share = " + totValStr;
                 tvTotVal.setText(totValTxt);
+
 
             }
         });

@@ -34,6 +34,7 @@ import com.android.volley.VolleyError;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int TRIGGER_AUTO_COMPLETE = 100;
     private static final long AUTO_COMPLETE_DELAY = 300;
-    public static final String SHARED_PREFS_FILE = "mypref";
+
     public static final String EXTRA_TICKER = "com.example.csci571andriodstocks.MESSAGE";
     public static final String SEARCH_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/search/";
     public static final String PRICE_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/price/";
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private List<Company> favouriteList;
     private List<Company> portfolioList;
     private String netWorth;
+    private double cash;
     private Map<String, String> fromStorageFavorite;
     private Map<String, String> fromStoragePortfolio;
 //    private String tickers;
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         handleIntent(getIntent());
         setContentView(R.layout.activity_main);
         ctx = this;
-        sharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(LocalStorage.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
         storage = new LocalStorage(sharedPreferences, editor);
         date  = (TextView) findViewById(R.id.date_view_id);
@@ -117,13 +119,14 @@ public class MainActivity extends AppCompatActivity {
         sectionedAdapter = new SectionedRecyclerViewAdapter();
         this.favouriteList = new ArrayList<>();
         this.portfolioList = new ArrayList<>();
-        netWorth = sharedPreferences.getString(LocalStorage.NET_WORTH, "20,000.00");
+        netWorth = sharedPreferences.getString(LocalStorage.CASH_IN_HAND, "20000.00");
+        cash = Double.parseDouble(netWorth);
         Log.e("NETWORH", "networth: " + netWorth);
 
         portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth,
-                (section, itemAdapterPosition) -> Log.i("clicked event", "got a click at position " + itemAdapterPosition));
+                (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
         favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList,
-                (section, itemAdapterPosition) -> Log.i("clicked event", "got a click at position " + itemAdapterPosition));
+                (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
 
 
         sectionedAdapter.addSection(portFolioSection);
@@ -288,6 +291,7 @@ public class MainActivity extends AppCompatActivity {
 
         ApiCall.make(this, tickers, PRICE_URL, response -> {
             //parsing logic, please change it as per your requirement
+            double stockValue = 0;
 
             Log.e("SIZE..", "company list size " + companiesList.size() + "should be: " + tickersArray.length);
 
@@ -312,11 +316,17 @@ public class MainActivity extends AppCompatActivity {
                     }else{
                         shares = fromStoragePortfolio.get(ticker);
                         name_or_shares = fromStoragePortfolio.get(ticker);
+                        stockValue += Double.parseDouble(last) * Double.parseDouble(shares);
                     }
 
                     Log.e("COMPANY", ticker + "--" + last + "--" + prevClose + "--" + name +"--" + shares);
 
-                    Company newCompany = new Company(name, ticker,"", last, prevClose, name_or_shares, ctx);
+                    DecimalFormat df = new DecimalFormat("####0.00");
+                    Company newCompany = new Company(name, ticker,shares, last, prevClose, name_or_shares, ctx);
+
+                    newCompany.last = df.format(Double.parseDouble(newCompany.last));
+                    newCompany.change = Double.parseDouble(df.format(newCompany.change));
+
                     companiesList.set(tickerToPosition.get(ticker), newCompany);
 
                 }
@@ -334,6 +344,10 @@ public class MainActivity extends AppCompatActivity {
             }else{
                 portfolioList.clear();
                 portfolioList.addAll(companiesList);
+                DecimalFormat df = new DecimalFormat("####0.00");
+                netWorth = df.format(cash + stockValue);
+                portFolioSection.setNetWorth(netWorth);
+                Log.e("NETWORTH", netWorth);
                 sectionedAdapter.getAdapterForSection(portFolioSection).notifyAllItemsChanged();
             }
 

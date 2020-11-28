@@ -19,6 +19,7 @@ public class LocalStorage {
     public static final String FAVOURITES = "favourites";
     public static final String PORTFOLIO = "portfolio";
     public static final String NET_WORTH = "networth";
+    public static final String CASH_IN_HAND = "cash";
 
 
     private static SharedPreferences sharedPreferences;
@@ -66,6 +67,8 @@ public class LocalStorage {
 //        }
 //        return map;
 //    }
+
+
 
     public static <K, V> Map<K,V> getFromStorage(String key){
         Map<K, V> map = new LinkedHashMap<>();

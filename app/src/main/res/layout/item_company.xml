@@ -31,7 +31,7 @@
         android:textStyle="bold"
         android:gravity="center_vertical"
         app:layout_constraintBaseline_toBaselineOf="@+id/company_ticker"
-        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintEnd_toStartOf="@+id/btn_goTo"
         tools:text="9999.99" />
 
     <TextView
@@ -42,7 +42,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginBottom="4dp"
         android:gravity="center_vertical"
-        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Company name or shares" />
 
@@ -54,8 +54,8 @@
         android:layout_marginRight="8dp"
         android:layout_marginBottom="4dp"
         android:gravity="center_vertical"
-        app:layout_constraintBottom_toTopOf="@+id/view"
-        app:layout_constraintEnd_toStartOf="@+id/button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_goTo"
         tools:text="99.99" />
 
     <ImageView
@@ -65,26 +65,26 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toTopOf="@+id/view"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/company_price_change" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_goTo"
         android:layout_width="27dp"
         android:layout_height="28dp"
         android:background="@drawable/ic_baseline_keyboard_arrow_right_24"
         android:text=""
-        app:layout_constraintBottom_toTopOf="@id/view"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:gravity="center_vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:id="@+id/view"
+        android:id="@+id/divider_line"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:background="#c0c0c0"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />

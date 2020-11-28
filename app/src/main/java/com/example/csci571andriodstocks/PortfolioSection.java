@@ -17,7 +17,7 @@ public class PortfolioSection extends Section {
     private final String title;
     private final List<Company> list;
     private final PortfolioSection.ClickListener clickListener;
-    private final String netWorth;
+    private String netWorth;
 
     public PortfolioSection(@NonNull final String title, @NonNull final List<Company> list, String netWorth,
                      @NonNull final PortfolioSection.ClickListener clickListener) {
@@ -33,6 +33,9 @@ public class PortfolioSection extends Section {
         this.netWorth = netWorth;
     }
 
+    public void setNetWorth(String netWorth){
+        this.netWorth = netWorth;
+    }
 
 
     @Override
@@ -56,14 +59,14 @@ public class PortfolioSection extends Section {
         itemHolder.imgItem.setImageResource(company.arrow);
         itemHolder.change.setText(String.valueOf(company.change));
         itemHolder.change.setTextColor(company.changeColor);
-        itemHolder.shares_or_name.setText(company.name);
+        itemHolder.shares_or_name.setText(company.shares);
         itemHolder.last.setText(company.last);
 
         Log.i("VIEWCOLOR", "...........color" + company.changeColor);
 
 
-        itemHolder.rootView.setOnClickListener(v ->
-                clickListener.onItemRootViewClicked(this, itemHolder.getAdapterPosition())
+        itemHolder.btnGoTo.setOnClickListener(v ->
+                clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
         );
     }
 
@@ -125,6 +128,6 @@ public class PortfolioSection extends Section {
 
     interface ClickListener {
 
-        void onItemRootViewClicked(@NonNull final PortfolioSection section, final int itemAdapterPosition);
+        void onItemRootViewClicked(Company company, final int itemAdapterPosition);
     }
 }

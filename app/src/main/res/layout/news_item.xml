@@ -20,7 +20,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
         android:ellipsize="end"
-        android:maxLines="5"
+        android:maxLines="3"
         android:scrollHorizontally="true"
         android:text="TextView"
         android:textColor="@color/black"
