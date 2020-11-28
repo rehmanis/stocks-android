@@ -9,9 +9,11 @@ import androidx.recyclerview.widget.RecyclerView;
 public class CompanyHeaderViewHolder extends RecyclerView.ViewHolder {
 
     final TextView tvTitle;
+    final TextView tvNetWorth;
 
     CompanyHeaderViewHolder(@NonNull View view) {
         super(view);
         tvTitle = view.findViewById(R.id.tvTitle);
+        tvNetWorth = view.findViewById(R.id.tv_net_worth);
     }
 }

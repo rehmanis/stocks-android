@@ -51,7 +51,7 @@ public class DetailsActivity extends AppCompatActivity {
     public static final int TOT_API_CALLS = 3;
 
     private Map<String, String> myFavourites;
-    private Map<String, Integer> myPortfolio;
+    private Map<String, String> myPortfolio;
     private boolean isFavourites;
     private String ticker;
     private String name;
@@ -197,7 +197,7 @@ public class DetailsActivity extends AppCompatActivity {
                 myFavourites.put(ticker, name);
             }
             Log.i("added-removed", "favouroites......" + myFavourites);
-            LocalStorage.<String, String>setMap(LocalStorage.FAVOURITES, myFavourites);
+            LocalStorage.setMap(LocalStorage.FAVOURITES, myFavourites);
 
         }
         return true;
@@ -218,14 +218,14 @@ public class DetailsActivity extends AppCompatActivity {
                     Log.i("length:", "len: " + array.length());
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject row = array.getJSONObject(i);
-                        String last = row.getString("last");
-                        String prevClose = row.getString("prevClose");
-                        String low = row.getString("low");
-                        String bidPrice = row.getString("bidPrice");
-                        String openPrice = row.getString("open");
-                        String mid = row.getString("mid");
-                        String high = row.getString("high");
-                        String volume = row.getString("volume");
+                        String last = (row.getString("last") != "null") ? row.getString("last") : row.getString("tngoLast");;
+                        String prevClose = (row.getString("prevClose") != "null") ? row.getString("prevClose"): "0.0";
+                        String low = (row.getString("low") != "null") ? row.getString("low"): "0.0";
+                        String bidPrice = (row.getString("bidPrice") != "null") ? row.getString("bidPrice"): "0.0";;
+                        String openPrice = (row.getString("open") != "null") ? row.getString("open"): "0.0";;
+                        String mid = (row.getString("mid") != "null") ? row.getString("mid"): "0.0";
+                        String high = (row.getString("high") != "null") ? row.getString("high"): "0.0";
+                        String volume = (row.getString("volume") != "null") ? row.getString("volume"): "0.0";
 
                         TextView tvTicker = (TextView) findViewById(R.id.detail_ticker);
                         TextView tvLast = (TextView) findViewById(R.id.detail_last);
@@ -250,8 +250,8 @@ public class DetailsActivity extends AppCompatActivity {
 
                         if (myPortfolio.containsKey(ticker)){
 
-                            int shares = myPortfolio.get(ticker);
-                            double val = shares * Double.parseDouble(last);
+                            String shares = myPortfolio.get(ticker);
+                            double val = Double.parseDouble(shares) * Double.parseDouble(last);
                             tvShares.setText("Shares owned: " + shares);
                             tvMarketValue.setText("Market Value: " + fmt.format(val));
                         }

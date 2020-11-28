@@ -1,11 +1,9 @@
 package com.example.csci571andriodstocks;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,8 +11,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -26,25 +22,18 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.AdapterView;
 
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -52,11 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
-public class MainActivity extends AppCompatActivity implements WatchlistSection.ClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private static final int TRIGGER_AUTO_COMPLETE = 100;
     private static final long AUTO_COMPLETE_DELAY = 300;
@@ -64,34 +52,29 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
     public static final String EXTRA_TICKER = "com.example.csci571andriodstocks.MESSAGE";
     public static final String SEARCH_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/search/";
     public static final String PRICE_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/price/";
+    public static final int TOT_API_CALLS = 2;
 
     private SectionedRecyclerViewAdapter sectionedAdapter;
-    private WatchlistSection watchListSection;
+    private FavoriteSection favoriteSection;
+    private PortfolioSection portFolioSection;
     private AutoSuggestAdapter autoSuggestAdapter;
     private Handler handler;
     private Handler handler2 = new Handler();
     private LocalStorage storage;
     private List<Company> favouriteList;
-    private Map<String, String> fromStorageFav;
-    private String tickers;
+    private List<Company> portfolioList;
+    private String netWorth;
+    private Map<String, String> fromStorageFavorite;
+    private Map<String, String> fromStoragePortfolio;
+//    private String tickers;
     private ProgressBar spinner;
     private RecyclerView recyclerView;
     private TextView date;
     private Context ctx;
-
-
-
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
-
-//    private final Runnable watchListUpdatesRunnable = new Runnable() {
-//        @Override
-//        public void run() {
-//            makeApiCallPrice();
-////            handler.post(watchListUpdatesRunnable);
-//            handler2.postDelayed(watchListUpdatesRunnable, TimeUnit.SECONDS.toMillis(1));
-//        }
-//    };
+    private int numApiCalls;
+    private boolean isApiFailed;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -100,43 +83,72 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
         handleIntent(getIntent());
         setContentView(R.layout.activity_main);
         ctx = this;
-
-        // load tasks from preference
         sharedPreferences = getSharedPreferences(SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        storage = new LocalStorage(sharedPreferences, editor);
+        date  = (TextView) findViewById(R.id.date_view_id);
         spinner = (ProgressBar)findViewById(R.id.progressbar);
 
-        storage = new LocalStorage(sharedPreferences, editor);
-        fromStorageFav = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
-        this.tickers = String.join(",", fromStorageFav.keySet());
 
-        Log.i("TICKERS", "..................." + tickers);
+        init();
 
-        this.favouriteList = new ArrayList<>(fromStorageFav.keySet().size());
-        Log.i("FAV LEN", "..................." + this.favouriteList.size());
+    }
 
-        //create a date string.
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void onRestart() {
+        super.onRestart();
+        //When BACK BUTTON is pressed, the activity on the stack is restarted
+        //Do what you want on the refresh procedure here
+        init();
+        Log.e("RESTART","Activity restarted");
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void init() {
+        numApiCalls = 0;
+        isApiFailed = false;
+
         String date_n = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(new Date());
-        //get hold of textview.
-        date  = (TextView) findViewById(R.id.date_view_id);
+
         //set it as current date.
         date.setText(date_n);
 
         sectionedAdapter = new SectionedRecyclerViewAdapter();
-        watchListSection = new WatchlistSection("FAVORITES", this.favouriteList , this);
+        this.favouriteList = new ArrayList<>();
+        this.portfolioList = new ArrayList<>();
+        netWorth = sharedPreferences.getString(LocalStorage.NET_WORTH, "20,000.00");
+        Log.e("NETWORH", "networth: " + netWorth);
 
-        // Add your Sections
-//        final List<Company> companies = new LoadCompany(this, sectionedAdapter).getCompanies(LocalStorage.FAVOURITES);
+        portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth,
+                (section, itemAdapterPosition) -> Log.i("clicked event", "got a click at position " + itemAdapterPosition));
+        favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList,
+                (section, itemAdapterPosition) -> Log.i("clicked event", "got a click at position " + itemAdapterPosition));
 
-//        sectionedAdapter.addSection(new WatchlistSection("Portfolio", companies, this));
-        makeApiCallPrice(LocalStorage.FAVOURITES);
-        sectionedAdapter.addSection(watchListSection);
 
+        sectionedAdapter.addSection(portFolioSection);
+        sectionedAdapter.addSection(favoriteSection);
         recyclerView = (RecyclerView) findViewById(R.id.rvHome);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(sectionedAdapter);
 
+        spinner.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        date.setVisibility(View.GONE);
+
+        fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+        fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+
+        String favoriteTickers = String.join(",", fromStorageFavorite.keySet());
+        String portfolioTickers = String.join(",", fromStoragePortfolio.keySet());
+
+        Log.i("FAV LEN", "..................." + favoriteTickers);
+
+        makeApiCallPrice(LocalStorage.FAVOURITES, favoriteTickers);
+        makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
     }
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -151,30 +163,13 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
 
         AutoCompleteTextView mSearchAutoComplete = (AutoCompleteTextView) searchView.findViewById(R.id.search_src_text);
 
-//        SearchView.SearchAutoComplete mSearchAutoComplete = searchView.findViewById(R.id.search_src_text);
-
-//        ImageView searchIcon = (ImageView)searchView.findViewById(R.id.search_mag_icon);
-//        searchIcon.setAdjustViewBounds(true);
-//        searchIcon.setImageResource(R.drawable.ic_search_black_24dp);
-
-//        ImageView searchIcon = (ImageView)searchView.findViewById(R.id.search_mag_icon);
-//        searchIcon.setImageDrawable(R.drawable.ic_search_black_24dp);
-
-//        searchView.setQueryHint("");
-
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
 
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, restaurants);
         mSearchAutoComplete.setAdapter(autoSuggestAdapter);
 
-        mSearchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position).toString());
-            }
-        });
+        mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) ->
+                mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position).toString()));
 
         mSearchAutoComplete.addTextChangedListener(new TextWatcher() {
             @Override
@@ -208,31 +203,28 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
             }
         });
 
-        handler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                if (msg.what == TRIGGER_AUTO_COMPLETE) {
+        handler = new Handler( msg -> {
+            if (msg.what == TRIGGER_AUTO_COMPLETE) {
 
-                    String input = mSearchAutoComplete.getText().toString();
+                String input = mSearchAutoComplete.getText().toString();
 
-                    if (!TextUtils.isEmpty(mSearchAutoComplete.getText()) && input.length() >= 3) {
-                        Log.i("API", "...................API CALL: "+ input );
+                if (!TextUtils.isEmpty(mSearchAutoComplete.getText()) && input.length() >= 3) {
+                    Log.i("API", "...................API CALL: "+ input );
 
-                        makeApiCall(input);
-                    }
+                    makeApiCall(input);
                 }
-                return false;
             }
+            return false;
         });
 
         return true;
     }
 
-    @Override
-    public void onItemRootViewClicked(@NonNull final WatchlistSection section, final int itemAdapterPosition) {
-
-        Log.i("clicked event", "got a click at position " + itemAdapterPosition);
-    }
+//    @Override
+//    public void onItemRootViewClicked(@NonNull final WatchlistSection section, final int itemAdapterPosition) {
+//
+//        Log.i("clicked event", "got a click at position " + itemAdapterPosition);
+//    }
 
     private void makeApiCall(String text) {
         ApiCall.make(this, text, SEARCH_URL, new Response.Listener<String>() {
@@ -265,53 +257,99 @@ public class MainActivity extends AppCompatActivity implements WatchlistSection.
     }
 
 
-    private void makeApiCallPrice(String key) {
+    private void makeApiCallPrice(String key, String tickers) {
 
-        ApiCall.make(this, tickers, PRICE_URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                //parsing logic, please change it as per your requirement
-                List<Company> companiesList = new ArrayList<>();
+        Log.e("TICKERS", "key: " + key + "tickers: " + tickers);
+        String[] tickersArray = tickers.split(",");
+        Map<String, Integer> tickerToPosition = new HashMap<>();
+        List<Company> companiesList = new ArrayList<>();
 
-                try {
-                    JSONObject responseObject = new JSONObject(response);
-                    JSONArray array = responseObject.getJSONArray("results");
-                    Log.i("length:", "len: " + array.length());
-                    for (int i = 0; i < array.length(); i++) {
-                        JSONObject row = array.getJSONObject(i);
-                        String ticker = row.getString("ticker");
-                        String last = row.getString("last");
-                        String prevClose = row.getString("prevClose");
-                        String name = "";
+        // need this otherwise to make sure that the orderer of tickers is same as the one they
+        // were inserted in.
+        for (int i = 0; i < tickersArray.length; i++){
+            tickerToPosition.put(tickersArray[i], i);
+            companiesList.add(new Company());
+        }
 
-                        if (key.equals(LocalStorage.FAVOURITES)){
-                            name = fromStorageFav.get(ticker);
-                        }
 
-                        Company newCompany = new Company(name, ticker,"", last, prevClose, "", ctx);
-                        companiesList.add(newCompany);
-//                        watchListSection.updateItemPrice(i, newCompany.ticker, newCompany.name, newCompany.last,
-//                                newCompany.change, newCompany.changeColor, newCompany.arrow);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        if (tickers.length() == 0){
+            numApiCalls++;
 
-                favouriteList.clear();
-                favouriteList.addAll(companiesList);
-//                //IMPORTANT: set data here and notify
-//                autoSuggestAdapter.setData(stringList);
-                sectionedAdapter.getAdapterForSection(watchListSection).notifyAllItemsChanged(
-                        new WatchlistSection.ItemPriceUpdate());
+            if (isApiFailed || numApiCalls == TOT_API_CALLS){
+
+                numApiCalls = 0;
+                isApiFailed = false;
                 spinner.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 date.setVisibility(View.VISIBLE);
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("error", "error in search http " + error);
+            return;
+        }
+
+        ApiCall.make(this, tickers, PRICE_URL, response -> {
+            //parsing logic, please change it as per your requirement
+
+            Log.e("SIZE..", "company list size " + companiesList.size() + "should be: " + tickersArray.length);
+
+            try {
+                JSONObject responseObject = new JSONObject(response);
+                JSONArray array = responseObject.getJSONArray("results");
+                Log.i("length:", "len: " + array.length());
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject row = array.getJSONObject(i);
+                    String ticker = row.getString("ticker");
+                    String last = (row.getString("last") != "null") ? row.getString("last") : row.getString("tngoLast");
+                    String prevClose = row.getString("prevClose");
+                    String name = "";
+                    String shares = "";
+                    String name_or_shares = "";
+
+                    Log.e("NULL", "this is null " + (row.getString("last")));
+
+                    if (key.equals(LocalStorage.FAVOURITES)){
+                        name = fromStorageFavorite.get(ticker);
+                        name_or_shares = fromStorageFavorite.get(ticker);
+                    }else{
+                        shares = fromStoragePortfolio.get(ticker);
+                        name_or_shares = fromStoragePortfolio.get(ticker);
+                    }
+
+                    Log.e("COMPANY", ticker + "--" + last + "--" + prevClose + "--" + name +"--" + shares);
+
+                    Company newCompany = new Company(name, ticker,"", last, prevClose, name_or_shares, ctx);
+                    companiesList.set(tickerToPosition.get(ticker), newCompany);
+
+                }
+            } catch (Exception e) {
+                isApiFailed = true;
+                e.printStackTrace();
             }
+
+            if (key.equals(LocalStorage.FAVOURITES)){
+
+                favouriteList.clear();
+                favouriteList.addAll(companiesList);
+                sectionedAdapter.getAdapterForSection(favoriteSection).notifyAllItemsChanged();
+                Log.e("ERROR_DBUG", "size: " + favouriteList.size() + "company: " + favouriteList.get(0).name);
+            }else{
+                portfolioList.clear();
+                portfolioList.addAll(companiesList);
+                sectionedAdapter.getAdapterForSection(portFolioSection).notifyAllItemsChanged();
+            }
+
+            numApiCalls++;
+
+            if (isApiFailed || numApiCalls == TOT_API_CALLS){
+                numApiCalls = 0;
+                isApiFailed = false;
+                spinner.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                date.setVisibility(View.VISIBLE);
+            }
+
+        }, error -> {
+            isApiFailed = true;
+            Log.i("error", "error in search http " + error);
         });
     }
 

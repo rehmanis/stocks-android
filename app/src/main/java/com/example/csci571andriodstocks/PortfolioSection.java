@@ -1,6 +1,5 @@
 package com.example.csci571andriodstocks;
 
-import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
@@ -9,20 +8,19 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Arrays;
 import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 
-public class WatchlistSection extends Section {
-
+public class PortfolioSection extends Section {
     private final String title;
     private final List<Company> list;
-    private final ClickListener clickListener;
+    private final PortfolioSection.ClickListener clickListener;
+    private final String netWorth;
 
-    public WatchlistSection(@NonNull final String title, @NonNull final List<Company> list,
-                            @NonNull final ClickListener clickListener) {
+    public PortfolioSection(@NonNull final String title, @NonNull final List<Company> list, String netWorth,
+                     @NonNull final PortfolioSection.ClickListener clickListener) {
         // call constructor with layout resources for this Section header and items
         super(SectionParameters.builder()
                 .itemResourceId(R.layout.item_company)
@@ -32,7 +30,10 @@ public class WatchlistSection extends Section {
         this.title = title;
         this.list = list;
         this.clickListener = clickListener;
+        this.netWorth = netWorth;
     }
+
+
 
     @Override
     public int getContentItemsTotal() {
@@ -66,51 +67,51 @@ public class WatchlistSection extends Section {
         );
     }
 
-    @Override
-    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
-                                     final List<Object> payloads) {
+//    @Override
+//    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
+//                                     final List<Object> payloads) {
+//
+//        final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) holder;
+//
+//        Company company = list.get(position);
+//
+//        for (Object obj : payloads) {
+//            if (obj instanceof PortfolioSection.ItemPriceUpdate) {
+//                itemHolder.ticker.setText(company.ticker);
+//                itemHolder.shares_or_name.setText(company.name);
+//                itemHolder.imgItem.setImageResource(company.arrow);
+//                itemHolder.change.setText(String.valueOf(company.change));
+//                itemHolder.change.setTextColor(company.changeColor);
+//                itemHolder.last.setText(company.last);
+//            }
+//        }
+//
+//        itemHolder.rootView.setOnClickListener(v ->
+//                clickListener.onItemRootViewClicked(this, itemHolder.getAdapterPosition())
+//        );
+//    }
 
-        final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) holder;
-
-        Company company = list.get(position);
-
-        for (Object obj : payloads) {
-            if (obj instanceof ItemPriceUpdate) {
-                itemHolder.ticker.setText(company.ticker);
-                itemHolder.shares_or_name.setText(company.name);
-                itemHolder.imgItem.setImageResource(company.arrow);
-                itemHolder.change.setText(String.valueOf(company.change));
-                itemHolder.change.setTextColor(company.changeColor);
-                itemHolder.last.setText(company.last);
-            }
-        }
-
-        itemHolder.rootView.setOnClickListener(v ->
-                clickListener.onItemRootViewClicked(this, itemHolder.getAdapterPosition())
-        );
-    }
 
 
+//    void updateItemPrice(final int index, final String ticker, final String name_shares, final String last,
+//                         final double change, final @ColorInt int changeColor, final @DrawableRes int arrow) {
+//        Company watchItem = list.get(index);
+//
+//        watchItem.ticker = ticker;
+//        watchItem.name_or_shares = name_shares;
+//        watchItem.last = last;
+//        watchItem.change = change;
+//        watchItem.changeColor = changeColor;
+//        watchItem.arrow = arrow;
+//
+//    }
 
-    void updateItemPrice(final int index, final String ticker, final String name_shares, final String last,
-                         final double change, final @ColorInt int changeColor, final @DrawableRes int arrow) {
-        Company watchItem = list.get(index);
-
-        watchItem.ticker = ticker;
-        watchItem.name_or_shares = name_shares;
-        watchItem.last = last;
-        watchItem.change = change;
-        watchItem.changeColor = changeColor;
-        watchItem.arrow = arrow;
-
-    }
-
-    static class ItemPriceUpdate {
-    }
+//    static class ItemPriceUpdate {
+//    }
 
     @Override
     public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
-        // return an empty instance of ViewHolder for the headers of this section
+
         return new CompanyHeaderViewHolder(view);
     }
 
@@ -118,11 +119,12 @@ public class WatchlistSection extends Section {
     public void onBindHeaderViewHolder(final RecyclerView.ViewHolder holder) {
         final CompanyHeaderViewHolder headerHolder = (CompanyHeaderViewHolder) holder;
 
+        headerHolder.tvNetWorth.setText(netWorth);
         headerHolder.tvTitle.setText(title);
     }
 
     interface ClickListener {
 
-        void onItemRootViewClicked(@NonNull final WatchlistSection section, final int itemAdapterPosition);
+        void onItemRootViewClicked(@NonNull final PortfolioSection section, final int itemAdapterPosition);
     }
 }
