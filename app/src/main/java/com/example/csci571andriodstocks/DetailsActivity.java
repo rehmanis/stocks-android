@@ -149,9 +149,9 @@ public class DetailsActivity extends AppCompatActivity {
         makeApiCallPrice(ticker);
         makeApiCallSummary(ticker);
         makeApiCallNews(ticker);
-
-
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -202,8 +202,6 @@ public class DetailsActivity extends AppCompatActivity {
         }
         return true;
     }
-
-
 
 
     private void makeApiCallPrice(String ticker) {
@@ -353,6 +351,19 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
+    public void openTradeDialog(View view) {
+
+        final Dialog dialog = new Dialog(ctx);
+        dialog.setContentView(R.layout.trading_dialog);
+
+//        TextView tvNewsTitle = (TextView) dialog.findViewById(R.id.tvDialog_news_title);
+//        ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
+//        ImageButton btnTwitter = (ImageButton) dialog.findViewById(R.id.btn_twitter);
+//        ImageButton btnChrome = (ImageButton) dialog.findViewById(R.id.btn_chrome);
+
+        dialog.show();
+
+    }
     public void toggleDescription(View view){
 
         TextView tvDescription = (TextView) findViewById(R.id.tvDetails_desc);

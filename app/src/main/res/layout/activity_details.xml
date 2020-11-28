@@ -136,6 +136,7 @@
                     android:layout_marginRight="36dp"
                     android:layout_marginBottom="4dp"
                     android:text="Trade"
+                    android:onClick="openTradeDialog"
                     android:textColor="@color/white"
                     android:textAlignment="center"
                     android:background="@drawable/rounded_corners"
