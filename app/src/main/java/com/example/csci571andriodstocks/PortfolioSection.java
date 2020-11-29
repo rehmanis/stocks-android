@@ -59,7 +59,7 @@ public class PortfolioSection extends Section {
         itemHolder.imgItem.setImageResource(company.arrow);
         itemHolder.change.setText(String.valueOf(company.change));
         itemHolder.change.setTextColor(company.changeColor);
-        itemHolder.shares_or_name.setText(company.shares);
+        itemHolder.shares_or_name.setText(company.shares + " shares");
         itemHolder.last.setText(company.last);
 
         Log.i("VIEWCOLOR", "...........color" + company.changeColor);

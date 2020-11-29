@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -11,6 +12,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 //    private String tickers;
     private ProgressBar spinner;
     private RecyclerView recyclerView;
+    private NestedScrollView homeViewContainer;
     private TextView date;
     private Context ctx;
     private static SharedPreferences sharedPreferences;
@@ -90,7 +93,14 @@ public class MainActivity extends AppCompatActivity {
         storage = new LocalStorage(sharedPreferences, editor);
         date  = (TextView) findViewById(R.id.date_view_id);
         spinner = (ProgressBar)findViewById(R.id.progressbar);
+        homeViewContainer = findViewById(R.id.container_home);
+        TextView tvTingo = findViewById(R.id.tv_tingo);
 
+        tvTingo.setOnClickListener(v -> {
+            Uri uri = Uri.parse("https://www.tiingo.com/"); // missing 'http://' will cause crashed
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
+        });
 
         init();
 
@@ -136,8 +146,9 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(sectionedAdapter);
 
         spinner.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
-        date.setVisibility(View.GONE);
+//        recyclerView.setVisibility(View.GONE);
+//        date.setVisibility(View.GONE);
+        homeViewContainer.setVisibility(View.GONE);
 
         fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
         fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
@@ -284,8 +295,9 @@ public class MainActivity extends AppCompatActivity {
                 numApiCalls = 0;
                 isApiFailed = false;
                 spinner.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                date.setVisibility(View.VISIBLE);
+                homeViewContainer.setVisibility(View.VISIBLE);
+//                recyclerView.setVisibility(View.VISIBLE);
+//                date.setVisibility(View.VISIBLE);
             }
             return;
         }
@@ -313,7 +325,12 @@ public class MainActivity extends AppCompatActivity {
 
                     if (key.equals(LocalStorage.FAVOURITES)){
                         name = fromStorageFavorite.get(ticker);
-                        name_or_shares = fromStoragePortfolio.getOrDefault(ticker, fromStorageFavorite.get(ticker));
+                        name_or_shares = fromStorageFavorite.get(ticker);
+
+                        if (fromStoragePortfolio.containsKey(ticker)){
+                            name_or_shares = fromStoragePortfolio.get(ticker) + " shares";
+                        }
+
                     }else{
                         shares = fromStoragePortfolio.get(ticker);
                         name_or_shares = fromStoragePortfolio.get(ticker);
@@ -323,7 +340,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("COMPANY", ticker + "--" + last + "--" + prevClose + "--" + name +"--" + shares);
 
                     DecimalFormat df = new DecimalFormat("####0.00");
-                    Company newCompany = new Company(name, ticker,shares, last, prevClose, name_or_shares, ctx);
+                    Company newCompany = new Company(name, ticker, shares, last, prevClose, name_or_shares, ctx);
 
                     newCompany.last = df.format(Double.parseDouble(newCompany.last));
                     newCompany.change = Double.parseDouble(df.format(newCompany.change));
@@ -358,8 +375,9 @@ public class MainActivity extends AppCompatActivity {
                 numApiCalls = 0;
                 isApiFailed = false;
                 spinner.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                date.setVisibility(View.VISIBLE);
+                homeViewContainer.setVisibility(View.VISIBLE);
+//                recyclerView.setVisibility(View.VISIBLE);
+//                date.setVisibility(View.VISIBLE);
             }
 
         }, error -> {
