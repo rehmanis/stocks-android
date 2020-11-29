@@ -260,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void makeApiCallPrice(String key, String tickers) {
 
         Log.e("TICKERS", "key: " + key + "tickers: " + tickers);
@@ -312,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
 
                     if (key.equals(LocalStorage.FAVOURITES)){
                         name = fromStorageFavorite.get(ticker);
-                        name_or_shares = fromStorageFavorite.get(ticker);
+                        name_or_shares = fromStoragePortfolio.getOrDefault(ticker, fromStorageFavorite.get(ticker));
                     }else{
                         shares = fromStoragePortfolio.get(ticker);
                         name_or_shares = fromStoragePortfolio.get(ticker);

@@ -53,7 +53,7 @@ public class FavoriteSection extends Section {
         itemHolder.imgItem.setImageResource(company.arrow);
         itemHolder.change.setText(String.valueOf(company.change));
         itemHolder.change.setTextColor(company.changeColor);
-        itemHolder.shares_or_name.setText(company.name);
+        itemHolder.shares_or_name.setText(company.name_or_shares);
         itemHolder.last.setText(company.last);
 
         if (position == 0){

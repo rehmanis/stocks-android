@@ -373,24 +373,43 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    private boolean checkTradeError(double sharesInputed) {
+//    private boolean checkTradeError(double sharesInputed) {
+//
+//        if (sharesInputed <= 0){
+//
+//            Toast toast = Toast.makeText(this, "Cannot sell less than 0 shares", Toast.LENGTH_SHORT);
+//            toast.show();
+//            return false;
+//        }
+//
+//        if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed){
+//
+//            Toast toast = Toast.makeText(this, "Not enough shares to sell", Toast.LENGTH_SHORT);
+//            toast.show();
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
-        if (sharesInputed <= 0){
 
-            Toast toast = Toast.makeText(this, "Cannot sell less than 0 shares", Toast.LENGTH_SHORT);
-            toast.show();
-            return false;
-        }
+    public void openSuccessDialog(double sharesTraded, String type) {
 
-        if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed){
+        final Dialog dialog = new Dialog(ctx);
+        dialog.setContentView(R.layout.success_trade_dialog);
 
-            Toast toast = Toast.makeText(this, "Not enough shares to sell", Toast.LENGTH_SHORT);
-            toast.show();
-            return false;
-        }
+        TextView tvTradedMsg = (TextView) dialog.findViewById(R.id.tv_shares_traded_msg);
+        tvTradedMsg.setText("You have successfully " + type + " " + sharesTraded + " of " + ticker);
+        Button btnDone = (Button) dialog.findViewById(R.id.btn_done);
 
-        return true;
+        dialog.show();
+
+        btnDone.setOnClickListener(v -> dialog.dismiss());
+
+
+
     }
+
 
     public void openTradeDialog(View view) {
 
@@ -460,17 +479,20 @@ public class DetailsActivity extends AppCompatActivity {
             editor.commit();
             dialog.dismiss();
 
+            openSuccessDialog(sharesInputed, "bought");
+
         });
 
         btnSell.setOnClickListener(v -> {
 
             double sharesInputed = 0;
+            double cashReceived;
 
-            if (etShareInput.getText().length() != 0){
+            if (etShareInput.getText().length() != 0) {
 
                 try {
                     sharesInputed = Double.parseDouble(String.valueOf(etShareInput.getText()));
-                } catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
                     toast.show();
                     return;
@@ -478,21 +500,45 @@ public class DetailsActivity extends AppCompatActivity {
             }
 
 
-            if (sharesInputed <= 0){
+            if (sharesInputed <= 0) {
 
                 Toast toast = Toast.makeText(this, "Cannot sell less than 0 shares", Toast.LENGTH_SHORT);
                 toast.show();
                 return;
             }
 
-            if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed){
+            if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed) {
                 Toast toast = Toast.makeText(this, "Not enough shares to sell", Toast.LENGTH_SHORT);
                 toast.show();
                 return;
             }
 
+            if (BuildConfig.DEBUG && !myPortfolio.containsKey(ticker)) {
+                throw new AssertionError("Assertion failed");
+            }
 
 
+            double totShares = Double.parseDouble(myPortfolio.get(ticker)) - sharesInputed;
+            DecimalFormat df = new DecimalFormat("####0.00");
+
+
+            Log.e("outside", "out: " + myPortfolio.get(ticker) + " " + etShareInput.getText());
+            if (totShares <= 0.000001){
+                Log.e("here", "here");
+                myPortfolio.remove(ticker);
+            }else{
+                myPortfolio.put(ticker, String.valueOf(df.format(totShares)));
+            }
+
+            LocalStorage.setMap(LocalStorage.PORTFOLIO, myPortfolio);
+            cashReceived = (lastPrice * sharesInputed);
+
+            cashInHand = df.format(Double.parseDouble(cashInHand) + cashReceived);
+            editor.putString(LocalStorage.CASH_IN_HAND, cashInHand);
+            editor.commit();
+            dialog.dismiss();
+
+            openSuccessDialog(sharesInputed, "sold");
 
         });
 
