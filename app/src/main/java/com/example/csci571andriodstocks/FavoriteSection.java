@@ -1,12 +1,16 @@
 package com.example.csci571andriodstocks;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -18,6 +22,7 @@ public class FavoriteSection extends Section {
     private final String title;
     private final List<Company> list;
     private final ClickListener clickListener;
+
 
     public FavoriteSection(@NonNull final String title, @NonNull final List<Company> list,
                            @NonNull final ClickListener clickListener) {
@@ -31,6 +36,8 @@ public class FavoriteSection extends Section {
         this.list = list;
         this.clickListener = clickListener;
     }
+
+
 
     @Override
     public int getContentItemsTotal() {
@@ -63,10 +70,48 @@ public class FavoriteSection extends Section {
         Log.i("VIEWCOLOR", "...........color" + company.changeColor);
 
 
-        itemHolder.btnGoTo.setOnClickListener(v ->
+        itemHolder.rootView.setOnClickListener(v ->
                 clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
         );
+
+
+
     }
+
+//
+//    private void enableSwipeToDeleteAndUndo() {
+//        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
+//            @Override
+//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+//
+//                final int position = viewHolder.getAdapterPosition();
+//                Log.e("POSITION", "my position: " + position);
+//                final Company item = favoriteSection.getData().get(position);
+//                Log.e("SIZE", "my position: " + favoriteSection.getData().size());
+//
+//                favoriteSection.removeItem(position);
+//                sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemRemoved(position);
+//
+//                Snackbar snackbar = Snackbar
+//                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
+//                snackbar.setAction("UNDO", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//
+//                        favoriteSection.restoreItem(item, position);
+//                        recyclerView.scrollToPosition(position);
+//                    }
+//                });
+//
+//                snackbar.setActionTextColor(Color.YELLOW);
+//                snackbar.show();
+//
+//            }
+//        };
+//
+//        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
+//        itemTouchhelper.attachToRecyclerView(recyclerView);
+//    }
 
 //    @Override
 //    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
@@ -123,8 +168,28 @@ public class FavoriteSection extends Section {
         headerHolder.tvTitle.setText(title);
     }
 
+    public void removeItem(int position) {
+        list.remove(position);
+
+
+    }
+
+    public void restoreItem(Company item, int position) {
+        list.add(position, item);
+    }
+
+    public List<Company> getData() {
+        return list;
+    }
+
     interface ClickListener {
 
         void onItemRootViewClicked(Company company, final int itemAdapterPosition);
     }
+
+    interface swipeToDeleteCallback {
+
+        void onItemSwiped(Company company, final int itemAdapterPosition);
+    }
+
 }

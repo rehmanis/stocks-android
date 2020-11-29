@@ -65,7 +65,7 @@ public class PortfolioSection extends Section {
         Log.i("VIEWCOLOR", "...........color" + company.changeColor);
 
 
-        itemHolder.btnGoTo.setOnClickListener(v ->
+        itemHolder.rootView.setOnClickListener(v ->
                 clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
         );
     }

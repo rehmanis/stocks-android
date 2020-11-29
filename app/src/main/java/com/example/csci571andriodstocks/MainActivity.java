@@ -1,10 +1,13 @@
 package com.example.csci571andriodstocks;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -12,6 +15,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +36,7 @@ import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -80,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private static SharedPreferences.Editor editor;
     private int numApiCalls;
     private boolean isApiFailed;
+    CoordinatorLayout coordinatorLayout;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -94,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         date  = (TextView) findViewById(R.id.date_view_id);
         spinner = (ProgressBar)findViewById(R.id.progressbar);
         homeViewContainer = findViewById(R.id.container_home);
+        coordinatorLayout = findViewById(R.id.main_coordinator_layout);
         TextView tvTingo = findViewById(R.id.tv_tingo);
 
         tvTingo.setOnClickListener(v -> {
@@ -133,10 +140,17 @@ public class MainActivity extends AppCompatActivity {
         cash = Double.parseDouble(netWorth);
         Log.e("NETWORH", "networth: " + netWorth);
 
+//        portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth, new PortfolioSection.ClickListener() {
+//            @Override
+//            public void onItemRootViewClicked(Company company, int itemAdapterPosition) {
+//
+//            }
+//        });
+
         portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth,
                 (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
-        favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList,
-                (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
+                favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList,
+                        (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
 
 
         sectionedAdapter.addSection(portFolioSection);
@@ -144,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.rvHome);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(sectionedAdapter);
+        enableSwipeToDeleteAndUndo();
 
         spinner.setVisibility(View.VISIBLE);
 //        recyclerView.setVisibility(View.GONE);
@@ -152,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
         fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
         fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+
 
         String favoriteTickers = String.join(",", fromStorageFavorite.keySet());
         String portfolioTickers = String.join(",", fromStoragePortfolio.keySet());
@@ -162,6 +178,67 @@ public class MainActivity extends AppCompatActivity {
         makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
     }
 
+
+    private void enableSwipeToDeleteAndUndo() {
+        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
+
+
+            @Override
+            public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+
+                int dragFlag = 0;
+                int swipeFlag = ItemTouchHelper.LEFT;
+
+                if (viewHolder instanceof CompanyHeaderViewHolder ||
+                        sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
+                    swipeFlag = 0;
+                    dragFlag = 0;
+                }
+
+                return makeMovementFlags(dragFlag, swipeFlag);
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+
+                Log.e("INSTANCE", "viewHolder " + (viewHolder instanceof CompanyHeaderViewHolder));
+
+                final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
+                final int position = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
+
+
+                Log.e("POSITION", "my position: " + position);
+                final Company item = favoriteSection.getData().get(position);
+                Log.e("Company", "my companu: " + item.name);
+
+//                final Company item = favoriteSection.getData().get(sectionedAdapter.getPositionInSection(position));
+                Log.e("SIZE", "my size: " + favoriteSection.getData().size());
+
+                favoriteSection.removeItem(position);
+                sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemRemoved(position);
+                fromStorageFavorite.remove(item.ticker);
+                LocalStorage.setMap(LocalStorage.FAVOURITES, fromStorageFavorite);
+
+                Snackbar snackbar = Snackbar
+                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
+                snackbar.setAction("UNDO", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+                        favoriteSection.restoreItem(item, position);
+                        recyclerView.scrollToPosition(position);
+                    }
+                });
+
+                snackbar.setActionTextColor(Color.YELLOW);
+                snackbar.show();
+
+            }
+        };
+
+        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
+        itemTouchhelper.attachToRecyclerView(recyclerView);
+    }
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
