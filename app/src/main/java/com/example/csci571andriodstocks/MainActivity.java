@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -76,11 +78,12 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, String> fromStorageFavorite;
     private Map<String, String> fromStoragePortfolio;
 //    private String tickers;
-    private ProgressBar spinner;
+//    private ProgressBar spinner;
     private RecyclerView recyclerView;
     private NestedScrollView homeViewContainer;
     private TextView date;
     private Context ctx;
+    private View spinnerContainer;
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
     private int numApiCalls;
@@ -98,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         editor = sharedPreferences.edit();
         storage = new LocalStorage(sharedPreferences, editor);
         date  = (TextView) findViewById(R.id.date_view_id);
-        spinner = (ProgressBar)findViewById(R.id.progressbar);
+        spinnerContainer = findViewById(R.id.progressbar_container);
+//        spinner = (ProgressBar)findViewById(R.id.progressbar);
         homeViewContainer = findViewById(R.id.container_home);
         coordinatorLayout = findViewById(R.id.main_coordinator_layout);
         TextView tvTingo = findViewById(R.id.tv_tingo);
@@ -147,9 +151,9 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth,
+        portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth, ctx,
                 (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
-                favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList,
+                favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList, ctx,
                         (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
 
 
@@ -157,10 +161,16 @@ public class MainActivity extends AppCompatActivity {
         sectionedAdapter.addSection(favoriteSection);
         recyclerView = (RecyclerView) findViewById(R.id.rvHome);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(sectionedAdapter);
-        enableSwipeToDeleteAndUndo();
 
-        spinner.setVisibility(View.VISIBLE);
+        enableSwipeToDeleteAndUndo();
+//        enableItemDragFavorite();
+//        enableItemDragPortfolio();
+        recyclerView.setAdapter(sectionedAdapter);
+
+
+        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
+        spinnerContainer.setVisibility(View.VISIBLE);
 //        recyclerView.setVisibility(View.GONE);
 //        date.setVisibility(View.GONE);
         homeViewContainer.setVisibility(View.GONE);
@@ -178,6 +188,88 @@ public class MainActivity extends AppCompatActivity {
         makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
     }
 
+    private void enableItemDragPortfolio() {
+
+        ItemTouchHelper.Callback callback = new ItemMoveCallback(portFolioSection) {
+
+//            @Override
+//            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+//
+//                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+//
+//                if (viewHolder instanceof CompanyHeaderViewHolder ||
+//                        sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof FavoriteSection){
+//
+//                    dragFlags = 0;
+//                    Log.e("FLAGS PORTFOLIO", "------" +
+//                            (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof FavoriteSection));
+//                }
+//
+//                return makeMovementFlags(dragFlags, 0);
+//            }
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+
+                if (target instanceof CompanyHeaderViewHolder ||
+                        sectionedAdapter.getSectionForPosition(target.getAdapterPosition()) instanceof FavoriteSection){
+
+                    Log.e("NO MOVE PORTFOLIO", "---Portfolio Should not move-----");
+                    return true;
+                }
+
+
+                final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
+
+                int fromPosition = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
+                int targetPosition = sectionedAdapter.getPositionInSection(target.getAdapterPosition());
+
+                portFolioSection.onRowMoved(fromPosition, targetPosition);
+                sectionedAdapter.getAdapterForSection(portFolioSection).notifyItemMoved(fromPosition, targetPosition);
+                return false;
+            }
+        };
+
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+    }
+
+
+    private void enableItemDragFavorite() {
+
+        ItemTouchHelper.Callback callback = new ItemMoveCallback(favoriteSection) {
+
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+
+
+
+                if (target instanceof CompanyHeaderViewHolder ||
+                        sectionedAdapter.getSectionForPosition(target.getAdapterPosition()) instanceof PortfolioSection){
+
+                    Log.e("NO MOVE FAVORITE", "---FAVORITE Should not move-----");
+                    return false;
+                }
+
+                Log.e("FAV OUTSIDE", "OUTSIDE___________");
+
+                final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
+                int fromPosition = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
+                int targetPosition = sectionedAdapter.getPositionInSection(target.getAdapterPosition());
+
+                favoriteSection.onRowMoved(fromPosition, targetPosition);
+                sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemMoved(fromPosition, targetPosition);
+                return true;
+            }
+        };
+
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+    }
+
 
     private void enableSwipeToDeleteAndUndo() {
         SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
@@ -192,8 +284,9 @@ public class MainActivity extends AppCompatActivity {
                 if (viewHolder instanceof CompanyHeaderViewHolder ||
                         sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
                     swipeFlag = 0;
-                    dragFlag = 0;
                 }
+
+                Log.e("INSTANCE", "viewHolder " + (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection));
 
                 return makeMovementFlags(dragFlag, swipeFlag);
             }
@@ -201,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
 
-                Log.e("INSTANCE", "viewHolder " + (viewHolder instanceof CompanyHeaderViewHolder));
+
 
                 final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
                 final int position = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
@@ -371,7 +464,7 @@ public class MainActivity extends AppCompatActivity {
 
                 numApiCalls = 0;
                 isApiFailed = false;
-                spinner.setVisibility(View.GONE);
+                spinnerContainer.setVisibility(View.GONE);
                 homeViewContainer.setVisibility(View.VISIBLE);
 //                recyclerView.setVisibility(View.VISIBLE);
 //                date.setVisibility(View.VISIBLE);
@@ -451,7 +544,7 @@ public class MainActivity extends AppCompatActivity {
             if (isApiFailed || numApiCalls == TOT_API_CALLS){
                 numApiCalls = 0;
                 isApiFailed = false;
-                spinner.setVisibility(View.GONE);
+                spinnerContainer.setVisibility(View.GONE);
                 homeViewContainer.setVisibility(View.VISIBLE);
 //                recyclerView.setVisibility(View.VISIBLE);
 //                date.setVisibility(View.VISIBLE);

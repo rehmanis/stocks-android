@@ -41,6 +41,7 @@ abstract public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
 
 
+
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
         return false;

@@ -67,7 +67,8 @@ public class DetailsActivity extends AppCompatActivity {
     private GridView statGrid;
     private RecyclerView recyclerViewNews;
     private String[] stats;
-    private ProgressBar spinner;
+//    private ProgressBar spinner;
+    private View spinnerContainer;
     private int numApiCalls;
     private boolean isApiFailed;
     private CustomGridAdapter customGridAdapter;
@@ -104,7 +105,8 @@ public class DetailsActivity extends AppCompatActivity {
 
 
         statGrid = (GridView) findViewById(R.id.grid_view); // init GridView
-        spinner = (ProgressBar)findViewById(R.id.progressbar);
+//        spinner = (ProgressBar)findViewById(R.id.progressbar);
+        spinnerContainer = findViewById(R.id.progressbar_container);
         stats = new String[7];
         // Create an object of CustomAdapter and set Adapter to GirdView
         customGridAdapter = new CustomGridAdapter(this, stats);
@@ -303,7 +305,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                 } else if (numApiCalls == TOT_API_CALLS){
                     numApiCalls = 0;
-                    spinner.setVisibility(View.GONE);
+                    spinnerContainer.setVisibility(View.GONE);
                     nestedScrollView.setVisibility(View.VISIBLE);
                     isEllipses();
                 }
@@ -351,7 +353,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                 } else if (numApiCalls == TOT_API_CALLS){
                     numApiCalls = 0;
-                    spinner.setVisibility(View.GONE);
+                    spinnerContainer.setVisibility(View.GONE);
                     nestedScrollView.setVisibility(View.VISIBLE);
                     isEllipses();
                 }
@@ -683,7 +685,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                 } else if (numApiCalls == TOT_API_CALLS){
                     numApiCalls = 0;
-                    spinner.setVisibility(View.GONE);
+                    spinnerContainer.setVisibility(View.GONE);
                     nestedScrollView.setVisibility(View.VISIBLE);
                     isEllipses();
                 }

@@ -52,7 +52,7 @@ public class News {
 
         this.lastUpdated = days + lastAgoTxt;
 
-        Log.i("TEST" , currentDate + " - " + instant + " - " + this.lastUpdated);
+//        Log.i("TEST" , currentDate + " - " + instant + " - " + this.lastUpdated);
 
 //        try {
 ////            final SimpleDateFormat df = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);

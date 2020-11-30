@@ -129,9 +129,9 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         viewHolder.getTvNewsTitle().setText(news.title);
         viewHolder.getTvNewsSrc().setText(news.src);
 
-        if (position >=0 ){
-            Log.e("NEWS", "urlToImg: " + news.img + "\ntitle: " + news.title);
-        }
+//        if (position >=0 ){
+//            Log.e("NEWS", "urlToImg: " + news.img + "\ntitle: " + news.title);
+//        }
 
         ImageView ivNewsImg = (ImageView)  viewHolder.getIvNewsImg();
 

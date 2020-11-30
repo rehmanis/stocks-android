@@ -1,30 +1,36 @@
 package com.example.csci571andriodstocks;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.util.Collections;
 import java.util.List;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 
-public class FavoriteSection extends Section {
+public class FavoriteSection extends Section implements ItemMoveCallback.ItemTouchHelperContract {
 
     private final String title;
     private final List<Company> list;
     private final ClickListener clickListener;
-
+    private final Context ctx;
 
     public FavoriteSection(@NonNull final String title, @NonNull final List<Company> list,
+                           Context ctx,
                            @NonNull final ClickListener clickListener) {
         // call constructor with layout resources for this Section header and items
         super(SectionParameters.builder()
@@ -35,6 +41,7 @@ public class FavoriteSection extends Section {
         this.title = title;
         this.list = list;
         this.clickListener = clickListener;
+        this.ctx = ctx;
     }
 
 
@@ -71,6 +78,10 @@ public class FavoriteSection extends Section {
 
 
         itemHolder.rootView.setOnClickListener(v ->
+                clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
+        );
+
+        itemHolder.btnGoTo.setOnClickListener(v ->
                 clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
         );
 
@@ -170,8 +181,6 @@ public class FavoriteSection extends Section {
 
     public void removeItem(int position) {
         list.remove(position);
-
-
     }
 
     public void restoreItem(Company item, int position) {
@@ -182,14 +191,34 @@ public class FavoriteSection extends Section {
         return list;
     }
 
+    @Override
+    public void onRowMoved(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(list, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(list, i, i - 1);
+            }
+        }
+    }
+
+    @Override
+    public void onRowSelected(CompanyItemViewHolder myViewHolder) {
+        myViewHolder.rootView.setBackgroundColor(Color.GRAY);
+    }
+
+    @Override
+    public void onRowClear(CompanyItemViewHolder myViewHolder) {
+        myViewHolder.rootView.setBackgroundColor(ResourcesCompat.getColor(ctx.getResources(), R.color.grey, null));
+    }
+
     interface ClickListener {
 
         void onItemRootViewClicked(Company company, final int itemAdapterPosition);
     }
 
-    interface swipeToDeleteCallback {
 
-        void onItemSwiped(Company company, final int itemAdapterPosition);
-    }
 
 }

@@ -15,5 +15,6 @@
     <color name="show_more">#88000000</color>
     <color name="border">#11000000</color>
     <color name="green">#FF009c61</color>
+    <color name="progressBar">#FF6800e9</color>
 
 </resources>
