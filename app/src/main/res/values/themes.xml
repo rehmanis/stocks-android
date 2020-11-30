@@ -1,13 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.CSCI571AndriodStocks" parent="Theme.AppCompat.Light">
+    <style name="Theme.CSCI571AndriodStocks" parent="Theme.AppCompat.Light.NoActionBar">
 
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/grey</item>
+        <item name="colorPrimaryDark">@color/grey</item>
         <item name="colorPrimaryVariant">@color/grey</item>
 
 <!--        <item name="actionBarStyle">@style/MySearchViewStyle</item>-->
 
+    </style>
+
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name='MySearchViewStyle' parent='Widget.AppCompat.SearchView'>

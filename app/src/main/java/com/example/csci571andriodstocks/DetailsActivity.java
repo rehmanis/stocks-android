@@ -2,10 +2,12 @@ package com.example.csci571andriodstocks;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ActionBar;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -102,6 +104,10 @@ public class DetailsActivity extends AppCompatActivity {
         wv.loadUrl("file:///android_asset/charts.html");
         wv.getSettings().setJavaScriptEnabled(true);
 
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
         statGrid = (GridView) findViewById(R.id.grid_view); // init GridView
@@ -199,31 +205,44 @@ public class DetailsActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                // User chose the "Settings" item, show the app settings UI...
+                return true;
 
-        if (id == R.id.toggle_star) {
+            case R.id.toggle_star:
+                // User chose the "Favorite" action, mark the current item
+                // as a favorite...
 
-            myFavourites = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+                myFavourites = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
 
-            // do something here
-            if (isFavourites){
-                isFavourites = false;
-                item.setIcon(R.drawable.ic_baseline_star_border_24);
-                myFavourites.remove(ticker);
-                Toast toast = Toast.makeText(this, ticker + " was removed from favourites", Toast.LENGTH_SHORT);
-                toast.show();
-            } else{
-                isFavourites = true;
-                item.setIcon(R.drawable.ic_baseline_star_24);
-                myFavourites.put(ticker, name);
-                Toast toast = Toast.makeText(this, ticker + " was added to favourites", Toast.LENGTH_SHORT);
-                toast.show();
-            }
-            Log.i("added-removed", "favouroites......" + myFavourites);
-            LocalStorage.setMap(LocalStorage.FAVOURITES, myFavourites);
+                // do something here
+                if (isFavourites){
+                    isFavourites = false;
+                    item.setIcon(R.drawable.ic_baseline_star_border_24);
+                    myFavourites.remove(ticker);
+                    Toast toast = Toast.makeText(this, ticker + " was removed from favourites", Toast.LENGTH_SHORT);
+                    toast.show();
+                } else{
+                    isFavourites = true;
+                    item.setIcon(R.drawable.ic_baseline_star_24);
+                    myFavourites.put(ticker, name);
+                    Toast toast = Toast.makeText(this, ticker + " was added to favourites", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                Log.i("added-removed", "favouroites......" + myFavourites);
+                LocalStorage.setMap(LocalStorage.FAVOURITES, myFavourites);
+
+
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
 
         }
-        return true;
     }
 
 

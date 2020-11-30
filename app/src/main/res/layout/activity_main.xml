@@ -8,6 +8,15 @@
     android:background="@color/grey"
     tools:context=".MainActivity">
 
+
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:titleTextAppearance="@style/Toolbar.TitleText"
+        android:elevation="0dp" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/progressbar_container"
         android:layout_width="match_parent"
@@ -52,6 +61,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
+        android:layout_marginTop="50dp"
         android:fillViewport="true">
 
         <LinearLayout
@@ -73,6 +83,7 @@
                 android:id="@+id/rvHome"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
                 android:visibility="visible"/>
 
             <TextView
@@ -81,7 +92,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textStyle="italic"
-                android:padding="10dp"
+                android:paddingBottom="10dp"
                 android:text="Powered by Tingo" />
 
         </LinearLayout>

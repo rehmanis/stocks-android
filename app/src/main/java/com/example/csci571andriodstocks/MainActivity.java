@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -42,6 +43,7 @@ import com.google.android.material.snackbar.Snackbar;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -112,6 +114,10 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(intent);
         });
+
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
+//        myToolbar.bringToFront();
+        setSupportActionBar(myToolbar);
 
         init();
 
@@ -345,7 +351,16 @@ public class MainActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-        AutoCompleteTextView mSearchAutoComplete = (AutoCompleteTextView) searchView.findViewById(R.id.search_src_text);
+        SearchView.SearchAutoComplete mSearchAutoComplete = searchView.findViewById(R.id.search_src_text);
+
+//        try {
+//            Field field = TextView.class.getDeclaredField("mCursorDrawableRes");
+//            field.setAccessible(true);
+//            field.set(mSearchAutoComplete, R.drawable.my_cursor);
+//        } catch (Exception e) {
+//            // Ignore exception
+//        }
+
 
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
