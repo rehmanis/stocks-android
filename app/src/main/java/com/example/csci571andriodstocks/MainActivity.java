@@ -49,6 +49,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -91,12 +92,13 @@ public class MainActivity extends AppCompatActivity {
     private int numApiCalls;
     private boolean isApiFailed;
     CoordinatorLayout coordinatorLayout;
+    SwipeToDeleteCallback swipeToDeleteCallback;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        handleIntent(getIntent());
+//        handleIntent(getIntent());
         setContentView(R.layout.activity_main);
         ctx = this;
         sharedPreferences = getSharedPreferences(LocalStorage.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
@@ -119,7 +121,9 @@ public class MainActivity extends AppCompatActivity {
 //        myToolbar.bringToFront();
         setSupportActionBar(myToolbar);
 
+
         init();
+        enableSwipeToDeleteAndUndo();
 
     }
 
@@ -143,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
         //set it as current date.
         date.setText(date_n);
 
-        sectionedAdapter = new SectionedRecyclerViewAdapter();
-        this.favouriteList = new ArrayList<>();
-        this.portfolioList = new ArrayList<>();
         netWorth = sharedPreferences.getString(LocalStorage.CASH_IN_HAND, "20000.00");
         cash = Double.parseDouble(netWorth);
         Log.e("NETWORH", "networth: " + netWorth);
@@ -157,20 +158,20 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
+
+        sectionedAdapter = new SectionedRecyclerViewAdapter();
+        this.favouriteList = new ArrayList<>();
+        this.portfolioList = new ArrayList<>();
+
         portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth, ctx,
                 (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
-                favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList, ctx,
-                        (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
-
+        favoriteSection = new FavoriteSection("FAVORITES", this.favouriteList, ctx,
+                (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
 
         sectionedAdapter.addSection(portFolioSection);
         sectionedAdapter.addSection(favoriteSection);
-        recyclerView = (RecyclerView) findViewById(R.id.rvHome);
+        recyclerView = findViewById(R.id.rvHome);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        enableSwipeToDeleteAndUndo();
-//        enableItemDragFavorite();
-//        enableItemDragPortfolio();
         recyclerView.setAdapter(sectionedAdapter);
 
 
@@ -194,101 +195,76 @@ public class MainActivity extends AppCompatActivity {
         makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
     }
 
-    private void enableItemDragPortfolio() {
-
-        ItemTouchHelper.Callback callback = new ItemMoveCallback(portFolioSection) {
-
-//            @Override
-//            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-//
-//                int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-//
-//                if (viewHolder instanceof CompanyHeaderViewHolder ||
-//                        sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof FavoriteSection){
-//
-//                    dragFlags = 0;
-//                    Log.e("FLAGS PORTFOLIO", "------" +
-//                            (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof FavoriteSection));
-//                }
-//
-//                return makeMovementFlags(dragFlags, 0);
-//            }
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                                  RecyclerView.ViewHolder target) {
-
-                if (target instanceof CompanyHeaderViewHolder ||
-                        sectionedAdapter.getSectionForPosition(target.getAdapterPosition()) instanceof FavoriteSection){
-
-                    Log.e("NO MOVE PORTFOLIO", "---Portfolio Should not move-----");
-                    return true;
-                }
-
-
-                final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
-
-                int fromPosition = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
-                int targetPosition = sectionedAdapter.getPositionInSection(target.getAdapterPosition());
-
-                portFolioSection.onRowMoved(fromPosition, targetPosition);
-                sectionedAdapter.getAdapterForSection(portFolioSection).notifyItemMoved(fromPosition, targetPosition);
-                return false;
-            }
-        };
-
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerView);
-    }
-
-
-    private void enableItemDragFavorite() {
-
-        ItemTouchHelper.Callback callback = new ItemMoveCallback(favoriteSection) {
-
-
-            @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
-                                  RecyclerView.ViewHolder target) {
-
-
-
-                if (target instanceof CompanyHeaderViewHolder ||
-                        sectionedAdapter.getSectionForPosition(target.getAdapterPosition()) instanceof PortfolioSection){
-
-                    Log.e("NO MOVE FAVORITE", "---FAVORITE Should not move-----");
-                    return false;
-                }
-
-                Log.e("FAV OUTSIDE", "OUTSIDE___________");
-
-                final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
-                int fromPosition = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
-                int targetPosition = sectionedAdapter.getPositionInSection(target.getAdapterPosition());
-
-                favoriteSection.onRowMoved(fromPosition, targetPosition);
-                sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemMoved(fromPosition, targetPosition);
-                return true;
-            }
-        };
-
-        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-        touchHelper.attachToRecyclerView(recyclerView);
-    }
-
 
     private void enableSwipeToDeleteAndUndo() {
-        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
+        swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
 
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder,
+                                          int actionState) {
+
+//                toggleDeleteVisibility(false);
+                if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+                    if (viewHolder instanceof CompanyItemViewHolder) {
+
+                        Log.e("ON SELECT", "Trying to SELECT: " + viewHolder.getAdapterPosition());
+
+                        CompanyItemViewHolder myViewHolder =
+                                (CompanyItemViewHolder) viewHolder;
+
+                        if(viewHolder.getAdapterPosition() < 0){
+                            return;
+                        }
+
+                        if (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
+                            portFolioSection.onRowSelected(myViewHolder);
+                        }else{
+                            favoriteSection.onRowSelected(myViewHolder);
+                        }
+                    }
+                }
+
+                super.onSelectedChanged(viewHolder, actionState);
+            }
+
+            @Override
+            public void clearView(RecyclerView recyclerView,
+                                  RecyclerView.ViewHolder viewHolder) {
+
+                super.clearView(recyclerView, viewHolder);
+//                toggleDeleteVisibility(true);
+
+                Log.e("CLEAR_VIEW", "Trying to clear: " + viewHolder.getAdapterPosition());
+
+                if(viewHolder.getAdapterPosition() < 0  ){
+                    return;
+                }
+
+                if (viewHolder instanceof CompanyItemViewHolder) {
+
+                    CompanyItemViewHolder myViewHolder =
+                            (CompanyItemViewHolder) viewHolder;
+
+                    if (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
+                        portFolioSection.onRowClear(myViewHolder);
+                    }else{
+                        favoriteSection.onRowClear(myViewHolder);
+                    }
+                }
+            }
 
             @Override
             public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
 
-                int dragFlag = 0;
+                int dragFlag = ItemTouchHelper.UP | ItemTouchHelper.DOWN;;
                 int swipeFlag = ItemTouchHelper.LEFT;
 
-                if (viewHolder instanceof CompanyHeaderViewHolder ||
-                        sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
+                if (viewHolder instanceof CompanyHeaderViewHolder) {
+                    swipeFlag = 0;
+                    dragFlag = 0;
+                }
+
+                if (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
                     swipeFlag = 0;
                 }
 
@@ -298,9 +274,65 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                  RecyclerView.ViewHolder target) {
+
+                if (target instanceof CompanyHeaderViewHolder){
+                    Log.e("NO MOVE FAVORITE", "---FAVORITE Should not move-----");
+                    return false;
+                }
+
+                if (viewHolder.getItemViewType()  != target.getItemViewType()){
+                    Log.e("FAV OUTSIDE", "OUTSIDE___________" + viewHolder.getItemViewType() + " " + target.getItemViewType());
+                    return false;
+                }
+
+                if (viewHolder.getAdapterPosition() < 0 || target.getAdapterPosition() < 0) {
+                    return false;
+                }
+
+
+
+                final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
+
+                int fromPosition = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
+                int targetPosition = sectionedAdapter.getPositionInSection(target.getAdapterPosition());
+
+                if (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof FavoriteSection){
+
+                    final Company item = favoriteSection.getData().get(fromPosition);
+
+                    favoriteSection.onRowMoved(fromPosition, targetPosition);
+                    sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemMoved(fromPosition, targetPosition);
+
+                    Map<String, String> newMap = new LinkedHashMap<>();
+
+                    for (Company company: favoriteSection.getData()){
+                        newMap.put(company.ticker, company.name);
+                    }
+
+                    LocalStorage.setMap(LocalStorage.FAVOURITES, newMap);
+
+
+                }else if (sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
+                    portFolioSection.onRowMoved(fromPosition, targetPosition);
+                    sectionedAdapter.getAdapterForSection(portFolioSection).notifyItemMoved(fromPosition, targetPosition);
+
+                    Map<String, String> newMap = new LinkedHashMap<>();
+
+                    for (Company company: portFolioSection.getData()){
+                        newMap.put(company.ticker, company.shares);
+                    }
+
+                    LocalStorage.setMap(LocalStorage.PORTFOLIO, newMap);
+
+                }
+
+                return true;
+            }
+
+            @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-
-
 
                 final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
                 final int position = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
@@ -318,22 +350,26 @@ public class MainActivity extends AppCompatActivity {
                 fromStorageFavorite.remove(item.ticker);
                 LocalStorage.setMap(LocalStorage.FAVOURITES, fromStorageFavorite);
 
-                Snackbar snackbar = Snackbar
-                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
-                snackbar.setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
+//                Toast toast = Toast.makeText(this, ticker + " was removed from favourites", Toast.LENGTH_SHORT);
+//                toast.show();
 
-                        favoriteSection.restoreItem(item, position);
-                        recyclerView.scrollToPosition(position);
-                    }
-                });
-
-                snackbar.setActionTextColor(Color.YELLOW);
-                snackbar.show();
+//                Snackbar snackbar = Snackbar
+//                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
+//                snackbar.setAction("UNDO", new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//
+//                        favoriteSection.restoreItem(item, position);
+//                        recyclerView.scrollToPosition(position);
+//                    }
+//                });
+//
+//                snackbar.setActionTextColor(Color.YELLOW);
+//                snackbar.show();
 
             }
         };
+
 
         ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
         itemTouchhelper.attachToRecyclerView(recyclerView);
@@ -542,6 +578,7 @@ public class MainActivity extends AppCompatActivity {
 
                 favouriteList.clear();
                 favouriteList.addAll(companiesList);
+
                 sectionedAdapter.getAdapterForSection(favoriteSection).notifyAllItemsChanged();
                 Log.e("ERROR_DBUG", "size: " + favouriteList.size() + "company: " + favouriteList.get(0).name);
             }else{

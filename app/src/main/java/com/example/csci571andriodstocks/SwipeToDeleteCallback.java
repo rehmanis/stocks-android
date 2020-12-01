@@ -26,6 +26,7 @@ abstract public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
     private int intrinsicHeight;
 
 
+
     SwipeToDeleteCallback(Context context) {
         mContext = context;
         mBackground = new ColorDrawable();
@@ -35,17 +36,55 @@ abstract public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
         deleteDrawable = ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_delete_24);
         intrinsicWidth = deleteDrawable.getIntrinsicWidth();
         intrinsicHeight = deleteDrawable.getIntrinsicHeight();
-
-
     }
 
 
+    public void toggleDeleteVisibility (boolean visibility) {
+        deleteDrawable.setVisible(visibility, false);
+    }
 
+    @Override
+    public boolean isLongPressDragEnabled() {
+        return true;
+    }
+
+    @Override
+    public boolean isItemViewSwipeEnabled() {
+        return true;
+    }
 
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
-        return false;
+        return true;
     }
+
+//    @Override
+//    public void onSelectedChanged(RecyclerView.ViewHolder viewHolder,
+//                                  int actionState) {
+//
+//
+//        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+//            if (viewHolder instanceof CompanyItemViewHolder) {
+//                CompanyItemViewHolder myViewHolder =
+//                        (CompanyItemViewHolder) viewHolder;
+//                mAdapter.onRowSelected(myViewHolder);
+//            }
+//        }
+//
+//        super.onSelectedChanged(viewHolder, actionState);
+//    }
+//
+//    @Override
+//    public void clearView(RecyclerView recyclerView,
+//                          RecyclerView.ViewHolder viewHolder) {
+//        super.clearView(recyclerView, viewHolder);
+//
+//        if (viewHolder instanceof CompanyItemViewHolder) {
+//            CompanyItemViewHolder myViewHolder =
+//                    (CompanyItemViewHolder) viewHolder;
+//            mAdapter.onRowClear(myViewHolder);
+//        }
+//    }
 
     @Override
     public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
@@ -88,6 +127,14 @@ abstract public class SwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
     @Override
     public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
-        return 0.7f;
+        return 0.9f;
+    }
+
+    public interface ItemTouchHelperContract {
+
+        void onRowMoved(int fromPosition, int toPosition);
+        void onRowSelected(CompanyItemViewHolder myViewHolder);
+        void onRowClear(CompanyItemViewHolder myViewHolder);
+
     }
 }

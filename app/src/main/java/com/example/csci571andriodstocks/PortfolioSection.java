@@ -122,6 +122,10 @@ public class PortfolioSection extends Section implements ItemMoveCallback.ItemTo
 //    static class ItemPriceUpdate {
 //    }
 
+    public List<Company> getData() {
+        return list;
+    }
+
     @Override
     public RecyclerView.ViewHolder getHeaderViewHolder(View view) {
 
@@ -138,6 +142,21 @@ public class PortfolioSection extends Section implements ItemMoveCallback.ItemTo
 
     @Override
     public void onRowMoved(int fromPosition, int toPosition) {
+
+        if (list == null || list.size() == 0) {
+            return;
+        }
+        if (fromPosition < 0 || fromPosition >= list.size()) {
+            return;
+        }
+        if (toPosition < 0 || toPosition >= list.size()) {
+            return;
+        }
+        if (fromPosition == toPosition) {
+            return;
+        }
+
+
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(list, i, i + 1);

@@ -22,7 +22,7 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 
-public class FavoriteSection extends Section implements ItemMoveCallback.ItemTouchHelperContract {
+public class FavoriteSection extends Section implements SwipeToDeleteCallback.ItemTouchHelperContract {
 
     private final String title;
     private final List<Company> list;
@@ -193,6 +193,21 @@ public class FavoriteSection extends Section implements ItemMoveCallback.ItemTou
 
     @Override
     public void onRowMoved(int fromPosition, int toPosition) {
+
+        if (list == null || list.size() == 0) {
+            return;
+        }
+        if (fromPosition < 0 || fromPosition >= list.size()) {
+            return;
+        }
+        if (toPosition < 0 || toPosition >= list.size()) {
+            return;
+        }
+        if (fromPosition == toPosition) {
+            return;
+        }
+
+
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
                 Collections.swap(list, i, i + 1);

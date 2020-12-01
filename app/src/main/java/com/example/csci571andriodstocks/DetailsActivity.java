@@ -82,6 +82,8 @@ public class DetailsActivity extends AppCompatActivity {
     private SharedPreferences.Editor editor;
 //    private Company currCompany;
 //    private String descBtnTxt = "Show more";
+//    private boolean addedToFav;
+//    private boolean
 
 
 
