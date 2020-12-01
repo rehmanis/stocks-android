@@ -605,14 +605,12 @@ public class DetailsActivity extends AppCompatActivity {
                     }
                 }
 
-
                 totVal = lastPrice * shares;
                 lastStr = fmt.format(lastPrice);
                 totValStr = fmt.format(totVal);
 
                 totValTxt = s + " x " + lastStr + "/share = " + totValStr;
                 tvTotVal.setText(totValTxt);
-
 
             }
         });

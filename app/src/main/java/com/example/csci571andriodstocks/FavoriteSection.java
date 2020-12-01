@@ -74,7 +74,7 @@ public class FavoriteSection extends Section implements ItemMoveCallback.ItemTou
             itemHolder.dividerLine.setVisibility(View.GONE);
         }
 
-        Log.i("VIEWCOLOR", "...........color" + company.changeColor);
+//        Log.i("VIEWCOLOR", "...........color" + company.changeColor);
 
 
         itemHolder.rootView.setOnClickListener(v ->

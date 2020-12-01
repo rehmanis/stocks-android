@@ -72,7 +72,7 @@ public class PortfolioSection extends Section implements ItemMoveCallback.ItemTo
         itemHolder.shares_or_name.setText(company.shares + " shares");
         itemHolder.last.setText(company.last);
 
-        Log.i("VIEWCOLOR", "...........color" + company.changeColor);
+//        Log.i("VIEWCOLOR", "...........color" + company.changeColor);
 
 
         itemHolder.rootView.setOnClickListener(v ->

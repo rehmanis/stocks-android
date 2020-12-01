@@ -47,11 +47,11 @@ public class Company {
         if (change > 0) {
             this.arrow = R.drawable.ic_twotone_trending_up_24;
             this.changeColor = ResourcesCompat.getColor(ctx.getResources(), R.color.positive, null);
-            Log.i("COLOR", "----------color" + changeColor);
+//            Log.i("COLOR", "----------color" + changeColor);
         }else  if (change < 0){
             this.arrow = R.drawable.ic_baseline_trending_down_24;
             this.changeColor = ResourcesCompat.getColor(ctx.getResources(), R.color.negative, null);
-            Log.i("COLOR", "-----------color" + changeColor);
+//            Log.i("COLOR", "-----------color" + changeColor);
         }else{
             this.arrow = 0;
         }

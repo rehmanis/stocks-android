@@ -53,6 +53,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int TRIGGER_AUTO_COMPLETE = 100;
     private static final long AUTO_COMPLETE_DELAY = 300;
+    private static final long AUTO_REFRESH_PERIOD_MSEC = 15000;
 
     public static final String EXTRA_TICKER = "com.example.csci571andriodstocks.MESSAGE";
     public static final String SEARCH_URL = "https://csci571-trading-platform.wl.r.appspot.com/api/search/";
@@ -82,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, String> fromStoragePortfolio;
 //    private String tickers;
 //    private ProgressBar spinner;
+    private long counter;
     private RecyclerView recyclerView;
     private NestedScrollView homeViewContainer;
     private TextView date;
@@ -91,13 +95,14 @@ public class MainActivity extends AppCompatActivity {
     private static SharedPreferences.Editor editor;
     private int numApiCalls;
     private boolean isApiFailed;
+    private Timer timer;
     CoordinatorLayout coordinatorLayout;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        handleIntent(getIntent());
+//        handleIntent(getIntent());
         setContentView(R.layout.activity_main);
         ctx = this;
         sharedPreferences = getSharedPreferences(LocalStorage.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
@@ -124,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         enableSwipeToDeleteAndUndo();
         enableItemDragFavorite();
         enableItemDragPortfolio();
+
 
     }
 
@@ -188,10 +194,31 @@ public class MainActivity extends AppCompatActivity {
         String favoriteTickers = String.join(",", fromStorageFavorite.keySet());
         String portfolioTickers = String.join(",", fromStoragePortfolio.keySet());
 
-        Log.i("FAV LEN", "..................." + favoriteTickers);
+//        Log.i("FAV LEN", "..................." + favoriteTickers);
 
         makeApiCallPrice(LocalStorage.FAVOURITES, favoriteTickers);
         makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
+
+        timer = new Timer();
+        counter = 0;
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                // do your task here
+
+                fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+                fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+
+
+                String favTickers = String.join(",", fromStorageFavorite.keySet());
+                String portTickers = String.join(",", fromStoragePortfolio.keySet());
+
+                counter++;
+                Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
+                makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
+                makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
+            }
+        }, 0, AUTO_REFRESH_PERIOD_MSEC);
     }
 
     private void enableItemDragPortfolio() {
@@ -402,7 +429,7 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Log.i("well", " this worked " + query);
+//                Log.i("well", " this worked " + query);
                 String[] input = query.split("-");
                 redirectToDetails(input[0]);
                 return true;
@@ -420,7 +447,7 @@ public class MainActivity extends AppCompatActivity {
                 String input = mSearchAutoComplete.getText().toString();
 
                 if (!TextUtils.isEmpty(mSearchAutoComplete.getText()) && input.length() >= 3) {
-                    Log.i("API", "...................API CALL: "+ input );
+//                    Log.i("API", "...................API CALL: "+ input );
 
                     makeApiCall(input);
                 }
@@ -446,7 +473,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject responseObject = new JSONObject(response);
                     JSONArray array = responseObject.getJSONArray("results");
-                    Log.i("length:", "len: " + array.length());
+//                    Log.i("length:", "len: " + array.length());
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject row = array.getJSONObject(i);
 
@@ -471,7 +498,7 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void makeApiCallPrice(String key, String tickers) {
 
-        Log.e("TICKERS", "key: " + key + "tickers: " + tickers);
+//        Log.e("TICKERS", "key: " + key + "tickers: " + tickers);
         String[] tickersArray = tickers.split(",");
         Map<String, Integer> tickerToPosition = new HashMap<>();
         List<Company> companiesList = new ArrayList<>();
@@ -503,12 +530,12 @@ public class MainActivity extends AppCompatActivity {
             //parsing logic, please change it as per your requirement
             double stockValue = 0;
 
-            Log.e("SIZE..", "company list size " + companiesList.size() + "should be: " + tickersArray.length);
+//            Log.e("SIZE..", "company list size " + companiesList.size() + "should be: " + tickersArray.length);
 
             try {
                 JSONObject responseObject = new JSONObject(response);
                 JSONArray array = responseObject.getJSONArray("results");
-                Log.i("length:", "len: " + array.length());
+//                Log.i("length:", "len: " + array.length());
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject row = array.getJSONObject(i);
                     String ticker = row.getString("ticker");
@@ -518,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
                     String shares = "";
                     String name_or_shares = "";
 
-                    Log.e("NULL", "this is null " + (row.getString("last")));
+//                    Log.e("NULL", "this is null " + (row.getString("last")));
 
                     if (key.equals(LocalStorage.FAVOURITES)){
                         name = fromStorageFavorite.get(ticker);
@@ -534,7 +561,7 @@ public class MainActivity extends AppCompatActivity {
                         stockValue += Double.parseDouble(last) * Double.parseDouble(shares);
                     }
 
-                    Log.e("COMPANY", ticker + "--" + last + "--" + prevClose + "--" + name +"--" + shares);
+//                    Log.e("COMPANY", ticker + "--" + last + "--" + prevClose + "--" + name +"--" + shares);
 
                     DecimalFormat df = new DecimalFormat("####0.00");
                     Company newCompany = new Company(name, ticker, shares, last, prevClose, name_or_shares, ctx);
@@ -555,14 +582,14 @@ public class MainActivity extends AppCompatActivity {
                 favouriteList.clear();
                 favouriteList.addAll(companiesList);
                 sectionedAdapter.getAdapterForSection(favoriteSection).notifyAllItemsChanged();
-                Log.e("ERROR_DBUG", "size: " + favouriteList.size() + "company: " + favouriteList.get(0).name);
+//                Log.e("ERROR_DBUG", "size: " + favouriteList.size() + "company: " + favouriteList.get(0).name);
             }else{
                 portfolioList.clear();
                 portfolioList.addAll(companiesList);
                 DecimalFormat df = new DecimalFormat("####0.00");
                 netWorth = df.format(cash + stockValue);
                 portFolioSection.setNetWorth(netWorth);
-                Log.e("NETWORTH", netWorth);
+//                Log.e("NETWORTH", netWorth);
                 sectionedAdapter.getAdapterForSection(portFolioSection).notifyAllItemsChanged();
             }
 
@@ -596,32 +623,32 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void handleIntent(Intent intent) {
+//    private void handleIntent(Intent intent) {
+//
+//        Log.i("INTENT", "use entered the search "  + intent.ACTION_SEARCH + " " + intent.getAction());
+//
+//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+//            String query = intent.getStringExtra(SearchManager.QUERY);
+//            //use the query to search your data somehow
+//            Log.i("SEARCH", "use entered the search " + query);
+//            Toast toast = Toast.makeText(this, "search done", Toast.LENGTH_LONG);
+//            toast.show();
+//        }
+//    }
 
-        Log.i("INTENT", "use entered the search "  + intent.ACTION_SEARCH + " " + intent.getAction());
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            //use the query to search your data somehow
-            Log.i("SEARCH", "use entered the search " + query);
-            Toast toast = Toast.makeText(this, "search done", Toast.LENGTH_LONG);
-            toast.show();
-        }
-    }
-
-    @Override
-    public void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        handleIntent(intent);
-    }
+//    @Override
+//    public void onNewIntent(Intent intent) {
+//        super.onNewIntent(intent);
+//        setIntent(intent);
+//        handleIntent(intent);
+//    }
 
     public void redirectToDetails(String ticker) {
 
         Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra(EXTRA_TICKER, ticker);
         startActivity(intent);
-
+        timer.cancel();
     }
 
 

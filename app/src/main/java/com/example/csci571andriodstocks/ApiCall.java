@@ -40,7 +40,7 @@ public class ApiCall {
             listener, Response.ErrorListener errorListener) {
 
 //        String url = "https://csci571-trading-platform.wl.r.appspot.com/api/search/" + query;
-        Log.i("url->", url + query);
+//        Log.i("url->", url + query);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url + query,
                 listener, errorListener);
         ApiCall.getInstance(ctx).addToRequestQueue(stringRequest);

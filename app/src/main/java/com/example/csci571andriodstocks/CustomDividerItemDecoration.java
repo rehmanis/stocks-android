@@ -26,7 +26,7 @@ public class CustomDividerItemDecoration extends DividerItemDecoration {
     public void getItemOffsets (Rect outRect, View view, RecyclerView parent,
                                 RecyclerView.State state){
 
-        Log.e("DRAW GET OFFSET", "state count: " + state.getItemCount() + " view count: " + parent.getChildAdapterPosition(view));
+//        Log.e("DRAW GET OFFSET", "state count: " + state.getItemCount() + " view count: " + parent.getChildAdapterPosition(view));
 
         if(parent.getChildAdapterPosition(view) == state.getItemCount() - 1){
             return;
