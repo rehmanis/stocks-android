@@ -49,6 +49,10 @@ public class PortfolioSection extends Section implements ItemMoveCallback.ItemTo
         return list.size(); // number of items of this section
     }
 
+    public List<Company> getData() {
+        return list;
+    }
+
     @Override
     public RecyclerView.ViewHolder getItemViewHolder(View view) {
         // return a custom instance of ViewHolder for the items of this section
