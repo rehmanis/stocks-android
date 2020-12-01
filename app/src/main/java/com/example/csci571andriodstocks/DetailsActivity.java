@@ -110,7 +110,7 @@ public class DetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        statGrid = (GridView) findViewById(R.id.grid_view); // init GridView
+        statGrid = findViewById(R.id.grid_view); // init GridView
 //        spinner = (ProgressBar)findViewById(R.id.progressbar);
         spinnerContainer = findViewById(R.id.progressbar_container);
         stats = new String[7];
@@ -118,33 +118,33 @@ public class DetailsActivity extends AppCompatActivity {
         customGridAdapter = new CustomGridAdapter(this, stats);
         statGrid.setAdapter(customGridAdapter);
 
-        nestedScrollView = (NestedScrollView) findViewById(R.id.details_screen);
-        recyclerViewNews = (RecyclerView) findViewById(R.id.rvNews);
+        nestedScrollView = findViewById(R.id.details_screen);
+        recyclerViewNews = findViewById(R.id.rvNews);
         recyclerViewNews.setLayoutManager(new LinearLayoutManager(this));
 
         newsList = new ArrayList<>();
         customNewsAdapter = new CustomNewsAdapter(newsList, this,
-                (CustomNewsAdapter.OnItemClickListener) (newsItem, position) -> {
-//                    Uri uri = Uri.parse(newsItem.url); // missing 'http://' will cause crashed
-//                    Intent intent1 = new Intent(Intent.ACTION_VIEW, uri);
-//                    startActivity(intent1);
+                (newsItem, position) -> {
+
                     openChrome(newsItem.url);
                     Log.e("CLICK_NEWS", "news item clicked at " + position);
                 },
 
-                (CustomNewsAdapter.OnItemLongClickListener) (newsItem, position) -> {
+                (newsItem, position) -> {
 
                     final Dialog dialog = new Dialog(ctx);
                     dialog.setContentView(R.layout.news_dialog);
 
-                    TextView tvNewsTitle = (TextView) dialog.findViewById(R.id.tvDialog_news_title);
-                    ImageView ivNewsImg = (ImageView) dialog.findViewById(R.id.ivDialog_news_img);
-                    ImageButton btnTwitter = (ImageButton) dialog.findViewById(R.id.btn_twitter);
-                    ImageButton btnChrome = (ImageButton) dialog.findViewById(R.id.btn_chrome);
+                    TextView tvNewsTitle = dialog.findViewById(R.id.tvDialog_news_title);
+                    ImageView ivNewsImg = dialog.findViewById(R.id.ivDialog_news_img);
+                    ImageButton btnTwitter = dialog.findViewById(R.id.btn_twitter);
+                    ImageButton btnChrome = dialog.findViewById(R.id.btn_chrome);
 
                     tvNewsTitle.setText(newsItem.title);
-                    Picasso.with(ctx).load(newsItem.img)
-                            .into(ivNewsImg);
+//                    Picasso.with(ctx).load(newsItem.img)
+//                            .into(ivNewsImg);
+
+                    Picasso.with(ctx).load(newsItem.img).resize(1300, 0).into(ivNewsImg);
 
                     btnChrome.setOnClickListener(v -> openChrome(newsItem.url));
                     btnTwitter.setOnClickListener(v -> {
@@ -176,7 +176,6 @@ public class DetailsActivity extends AppCompatActivity {
         makeApiCallSummary(ticker);
         makeApiCallNews(ticker);
     }
-
 
 
     @Override
@@ -295,6 +294,8 @@ public class DetailsActivity extends AppCompatActivity {
                             double val = Double.parseDouble(shares) * Double.parseDouble(last);
                             tvShares.setText("Shares owned: " + shares);
                             tvMarketValue.setText("Market Value: " + fmt.format(val));
+                        }else {
+                            tvMarketValue.setText("Start Trading|");
                         }
 
 
@@ -425,7 +426,12 @@ public class DetailsActivity extends AppCompatActivity {
 
         dialog.show();
 
-        btnDone.setOnClickListener(v -> dialog.dismiss());
+        btnDone.setOnClickListener(v -> {
+            dialog.dismiss();
+            numApiCalls = TOT_API_CALLS - 1;
+            makeApiCallPrice(ticker);
+
+        });
 
 
 
