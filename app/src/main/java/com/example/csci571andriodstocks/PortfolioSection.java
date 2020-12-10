@@ -2,11 +2,7 @@ package com.example.csci571andriodstocks;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,9 +68,6 @@ public class PortfolioSection extends Section implements ItemMoveCallback.ItemTo
         itemHolder.shares_or_name.setText(company.shares + " shares");
         itemHolder.last.setText(company.last);
 
-//        Log.i("VIEWCOLOR", "...........color" + company.changeColor);
-
-
         itemHolder.rootView.setOnClickListener(v ->
                 clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
         );
@@ -84,47 +77,6 @@ public class PortfolioSection extends Section implements ItemMoveCallback.ItemTo
         );
     }
 
-//    @Override
-//    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
-//                                     final List<Object> payloads) {
-//
-//        final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) holder;
-//
-//        Company company = list.get(position);
-//
-//        for (Object obj : payloads) {
-//            if (obj instanceof PortfolioSection.ItemPriceUpdate) {
-//                itemHolder.ticker.setText(company.ticker);
-//                itemHolder.shares_or_name.setText(company.name);
-//                itemHolder.imgItem.setImageResource(company.arrow);
-//                itemHolder.change.setText(String.valueOf(company.change));
-//                itemHolder.change.setTextColor(company.changeColor);
-//                itemHolder.last.setText(company.last);
-//            }
-//        }
-//
-//        itemHolder.rootView.setOnClickListener(v ->
-//                clickListener.onItemRootViewClicked(this, itemHolder.getAdapterPosition())
-//        );
-//    }
-
-
-
-//    void updateItemPrice(final int index, final String ticker, final String name_shares, final String last,
-//                         final double change, final @ColorInt int changeColor, final @DrawableRes int arrow) {
-//        Company watchItem = list.get(index);
-//
-//        watchItem.ticker = ticker;
-//        watchItem.name_or_shares = name_shares;
-//        watchItem.last = last;
-//        watchItem.change = change;
-//        watchItem.changeColor = changeColor;
-//        watchItem.arrow = arrow;
-//
-//    }
-
-//    static class ItemPriceUpdate {
-//    }
 
     @Override
     public RecyclerView.ViewHolder getHeaderViewHolder(View view) {

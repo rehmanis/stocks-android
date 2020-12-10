@@ -75,8 +75,6 @@ public class MainActivity extends AppCompatActivity {
     private double cash;
     private Map<String, String> fromStorageFavorite;
     private Map<String, String> fromStoragePortfolio;
-//    private String tickers;
-//    private ProgressBar spinner;
     private long counter;
     private RecyclerView recyclerView;
     private NestedScrollView homeViewContainer;
@@ -97,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        handleIntent(getIntent());
         setContentView(R.layout.activity_main);
         isSelectedFromList = false;
         ctx = this;
@@ -106,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         storage = new LocalStorage(sharedPreferences, editor);
         date  = (TextView) findViewById(R.id.date_view_id);
         spinnerContainer = findViewById(R.id.progressbar_container);
-//        spinner = (ProgressBar)findViewById(R.id.progressbar);
         homeViewContainer = findViewById(R.id.container_home);
         coordinatorLayout = findViewById(R.id.main_coordinator_layout);
         TextView tvTingo = findViewById(R.id.tv_tingo);
@@ -118,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
-//        myToolbar.bringToFront();
         setSupportActionBar(myToolbar);
 
         init();
@@ -127,37 +122,24 @@ public class MainActivity extends AppCompatActivity {
         enableItemDragFavorite();
         enableItemDragPortfolio();
 
-        myRunnable = new Runnable() {
-            public void run() {
-                fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
-                fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+        myRunnable = () -> {
+            fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+            fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
 
 
-                String favTickers = String.join(",", fromStorageFavorite.keySet());
-                String portTickers = String.join(",", fromStoragePortfolio.keySet());
+            String favTickers = String.join(",", fromStorageFavorite.keySet());
+            String portTickers = String.join(",", fromStoragePortfolio.keySet());
 
-                counter++;
-                Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
-                makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
-                makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
-            }
+            counter++;
+            Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
+            makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
+            makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
         };
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void UpdateGUI() {
-//        fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
-//        fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
-//
-//
-//        String favTickers = String.join(",", fromStorageFavorite.keySet());
-//        String portTickers = String.join(",", fromStoragePortfolio.keySet());
-//
-//        counter++;
-//        Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
-//        makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
-//        makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
         myHandler.post(myRunnable);
     }
 
@@ -166,10 +148,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRestart() {
         super.onRestart();
         //When BACK BUTTON is pressed, the activity on the stack is restarted
-        //Do what you want on the refresh procedure here
-//        isSelectedFromList = true;
         init();
-        Log.e("RESTART","Activity restarted");
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -190,12 +169,6 @@ public class MainActivity extends AppCompatActivity {
         cash = Double.parseDouble(netWorth);
         Log.e("NETWORH", "networth: " + netWorth);
 
-//        portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth, new PortfolioSection.ClickListener() {
-//            @Override
-//            public void onItemRootViewClicked(Company company, int itemAdapterPosition) {
-//
-//            }
-//        });
 
         portFolioSection = new PortfolioSection("PORTFOLIO", this.portfolioList, netWorth, ctx,
                 (company, itemAdapterPosition) -> redirectToDetails(company.ticker));
@@ -209,30 +182,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(sectionedAdapter);
 
-
-
-
         spinnerContainer.setVisibility(View.VISIBLE);
-//        recyclerView.setVisibility(View.GONE);
-//        date.setVisibility(View.GONE);
         homeViewContainer.setVisibility(View.GONE);
 
         fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
         fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
 
-
         String favoriteTickers = String.join(",", fromStorageFavorite.keySet());
         String portfolioTickers = String.join(",", fromStoragePortfolio.keySet());
 
-//        Log.i("FAV LEN", "..................." + favoriteTickers);
-
         makeApiCallPrice(LocalStorage.FAVOURITES, favoriteTickers);
         makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
-
-
-
-
-
 
         timer = new Timer();
         counter = 0;
@@ -242,17 +202,6 @@ public class MainActivity extends AppCompatActivity {
                 // do your task here
                 UpdateGUI();
 
-//                fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
-//                fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
-//
-//
-//                String favTickers = String.join(",", fromStorageFavorite.keySet());
-//                String portTickers = String.join(",", fromStoragePortfolio.keySet());
-//
-//                counter++;
-//                Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
-//                makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
-//                makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
             }
         }, 0, AUTO_REFRESH_PERIOD_MSEC);
     }
@@ -327,15 +276,12 @@ public class MainActivity extends AppCompatActivity {
                         sectionedAdapter.getSectionForPosition(viewHolder.getAdapterPosition()) instanceof PortfolioSection){
                     dragFlags = 0;
                 }
-//                Log.e("FLAGS FAV", "------" + dragFlags);
                 return makeMovementFlags(dragFlags, 0);
             }
 
             @Override
             public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                                   RecyclerView.ViewHolder target) {
-
-//                Log.e("FAV OUTSIDE", "OUTSIDE___________");
 
                 if (target instanceof CompanyHeaderViewHolder) {
                     return  false;
@@ -394,13 +340,7 @@ public class MainActivity extends AppCompatActivity {
                 final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) viewHolder;
                 final int position = sectionedAdapter.getPositionInSection(itemHolder.getAdapterPosition());
 
-
-//                Log.e("POSITION", "my position: " + position);
                 final Company item = favoriteSection.getData().get(position);
-//                Log.e("Company", "my companu: " + item.name);
-
-//                final Company item = favoriteSection.getData().get(sectionedAdapter.getPositionInSection(position));
-//                Log.e("SIZE", "my size: " + favoriteSection.getData().size());
 
                 favoriteSection.removeItem(position);
                 sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemRemoved(position);
@@ -428,32 +368,17 @@ public class MainActivity extends AppCompatActivity {
 
         SearchView.SearchAutoComplete mSearchAutoComplete = searchView.findViewById(R.id.search_src_text);
 
-
-
-//        try {
-//            Field field = TextView.class.getDeclaredField("mCursorDrawableRes");
-//            field.setAccessible(true);
-//            field.set(mSearchAutoComplete, R.drawable.my_cursor);
-//        } catch (Exception e) {
-//            // Ignore exception
-//        }
-
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
 
         mSearchAutoComplete.setAdapter(autoSuggestAdapter);
         mSearchAutoComplete.setDropDownHeight(1300);
-//        mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) ->
-//                mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position)));
-
         mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
-            //... your stuff
 
-            String query = (String)parent.getItemAtPosition(position);
+//            String query = (String)parent.getItemAtPosition(position);
 
             mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position));
             isSelectedFromList = true;
-//            Log.e("Clicked", "I am here");
         });
 
 
@@ -478,7 +403,6 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-//                Log.i("well", " this worked " + query);
                 if (!isSelectedFromList){
 
                     return false;
@@ -501,7 +425,6 @@ public class MainActivity extends AppCompatActivity {
                 String input = mSearchAutoComplete.getText().toString();
 
                 if (!TextUtils.isEmpty(mSearchAutoComplete.getText()) && input.length() >= 3) {
-//                    Log.i("API", "...................API CALL: "+ input );
 
                     makeApiCall(input);
                 }
@@ -512,12 +435,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-//    @Override
-//    public void onItemRootViewClicked(@NonNull final WatchlistSection section, final int itemAdapterPosition) {
-//
-//        Log.i("clicked event", "got a click at position " + itemAdapterPosition);
-//    }
-
     private void makeApiCall(String text) {
         ApiCall.make(this, text, SEARCH_URL, new Response.Listener<String>() {
             @Override
@@ -527,7 +444,6 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     JSONObject responseObject = new JSONObject(response);
                     JSONArray array = responseObject.getJSONArray("results");
-//                    Log.i("length:", "len: " + array.length());
                     for (int i = 0; i < array.length(); i++) {
                         JSONObject row = array.getJSONObject(i);
 
@@ -540,24 +456,18 @@ public class MainActivity extends AppCompatActivity {
                 autoSuggestAdapter.setData(stringList);
                 autoSuggestAdapter.notifyDataSetChanged();
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("error", "error in search http " + error);
-            }
-        });
+        }, error -> Log.i("error", "error in search http " + error));
     }
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void makeApiCallPrice(String key, String tickers) {
 
-//        Log.e("TICKERS", "key: " + key + "tickers: " + tickers);
         String[] tickersArray = tickers.split(",");
         Map<String, Integer> tickerToPosition = new HashMap<>();
         List<Company> companiesList = new ArrayList<>();
 
-        // need this otherwise to make sure that the orderer of tickers is same as the one they
+        // need this to make sure that the order of tickers is same as the one they
         // were inserted in.
         for (int i = 0; i < tickersArray.length; i++){
             tickerToPosition.put(tickersArray[i], i);
@@ -574,22 +484,18 @@ public class MainActivity extends AppCompatActivity {
                 isApiFailed = false;
                 spinnerContainer.setVisibility(View.GONE);
                 homeViewContainer.setVisibility(View.VISIBLE);
-//                recyclerView.setVisibility(View.VISIBLE);
-//                date.setVisibility(View.VISIBLE);
             }
             return;
         }
 
         ApiCall.make(this, tickers, PRICE_URL, response -> {
-            //parsing logic, please change it as per your requirement
-            double stockValue = 0;
 
-//            Log.e("SIZE..", "company list size " + companiesList.size() + "should be: " + tickersArray.length);
+            double stockValue = 0;
 
             try {
                 JSONObject responseObject = new JSONObject(response);
                 JSONArray array = responseObject.getJSONArray("results");
-//                Log.i("length:", "len: " + array.length());
+
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject row = array.getJSONObject(i);
                     String ticker = row.getString("ticker");
@@ -598,8 +504,6 @@ public class MainActivity extends AppCompatActivity {
                     String name = "";
                     String shares = "";
                     String name_or_shares = "";
-
-//                    Log.e("NULL", "this is null " + (row.getString("last")));
 
                     if (key.equals(LocalStorage.FAVOURITES)){
                         name = fromStorageFavorite.get(ticker);
@@ -614,8 +518,6 @@ public class MainActivity extends AppCompatActivity {
                         name_or_shares = fromStoragePortfolio.get(ticker);
                         stockValue += Double.parseDouble(last) * Double.parseDouble(shares);
                     }
-
-//                    Log.e("COMPANY", ticker + "--" + last + "--" + prevClose + "--" + name +"--" + shares);
 
                     DecimalFormat df = new DecimalFormat("####0.00");
                     Company newCompany = new Company(name, ticker, shares, last, prevClose, name_or_shares, ctx);
@@ -636,14 +538,12 @@ public class MainActivity extends AppCompatActivity {
                 favouriteList.clear();
                 favouriteList.addAll(companiesList);
                 sectionedAdapter.getAdapterForSection(favoriteSection).notifyAllItemsChanged();
-//                Log.e("ERROR_DBUG", "size: " + favouriteList.size() + "company: " + favouriteList.get(0).name);
             }else{
                 portfolioList.clear();
                 portfolioList.addAll(companiesList);
                 DecimalFormat df = new DecimalFormat("####0.00");
                 netWorth = df.format(cash + stockValue);
                 portFolioSection.setNetWorth(netWorth);
-//                Log.e("NETWORTH", netWorth);
                 sectionedAdapter.getAdapterForSection(portFolioSection).notifyAllItemsChanged();
             }
 
@@ -654,8 +554,6 @@ public class MainActivity extends AppCompatActivity {
                 isApiFailed = false;
                 spinnerContainer.setVisibility(View.GONE);
                 homeViewContainer.setVisibility(View.VISIBLE);
-//                recyclerView.setVisibility(View.VISIBLE);
-//                date.setVisibility(View.VISIBLE);
             }
 
         }, error -> {
@@ -664,39 +562,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    private void getWatchListUpdates() {
-//
-//        for (int i = 0; i < favouriteList.size(); i++) {
-//            final Company item = favouriteList.get(i);
-//            watchListSection.updateItemPrice(i, item.last, item.change, item.changeColor, item.arrow);
-//        }
-//
-//        sectionedAdapter.getAdapterForSection(watchListSection).notifyAllItemsChanged(
-//                new WatchlistSection.ItemPriceUpdate());
-//    }
-
-
-
-//    private void handleIntent(Intent intent) {
-//
-//        Log.i("INTENT", "use entered the search "  + intent.ACTION_SEARCH + " " + intent.getAction());
-//
-//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-//            String query = intent.getStringExtra(SearchManager.QUERY);
-//            //use the query to search your data somehow
-//            Log.i("SEARCH", "use entered the search " + query);
-//            Toast toast = Toast.makeText(this, "search done", Toast.LENGTH_LONG);
-//            toast.show();
-//        }
-//    }
-
-//    @Override
-//    public void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        setIntent(intent);
-//        handleIntent(intent);
-//    }
-
     public void redirectToDetails(String ticker) {
 
         Intent intent = new Intent(this, DetailsActivity.class);
@@ -704,7 +569,5 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
         timer.cancel();
     }
-
-
 
 }

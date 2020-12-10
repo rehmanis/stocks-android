@@ -2,24 +2,13 @@ package com.example.csci571andriodstocks;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.View;
-
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.material.snackbar.Snackbar;
-
 import java.util.Collections;
 import java.util.List;
-
 import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
-import io.github.luizgrp.sectionedrecyclerviewadapter.SectionAdapter;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionParameters;
 
 public class FavoriteSection extends Section implements ItemMoveCallback.ItemTouchHelperContract {
@@ -74,8 +63,6 @@ public class FavoriteSection extends Section implements ItemMoveCallback.ItemTou
             itemHolder.dividerLine.setVisibility(View.GONE);
         }
 
-//        Log.i("VIEWCOLOR", "...........color" + company.changeColor);
-
 
         itemHolder.rootView.setOnClickListener(v ->
                 clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
@@ -89,82 +76,6 @@ public class FavoriteSection extends Section implements ItemMoveCallback.ItemTou
 
     }
 
-//
-//    private void enableSwipeToDeleteAndUndo() {
-//        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
-//            @Override
-//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
-//
-//                final int position = viewHolder.getAdapterPosition();
-//                Log.e("POSITION", "my position: " + position);
-//                final Company item = favoriteSection.getData().get(position);
-//                Log.e("SIZE", "my position: " + favoriteSection.getData().size());
-//
-//                favoriteSection.removeItem(position);
-//                sectionedAdapter.getAdapterForSection(favoriteSection).notifyItemRemoved(position);
-//
-//                Snackbar snackbar = Snackbar
-//                        .make(coordinatorLayout, "Item was removed from the list.", Snackbar.LENGTH_LONG);
-//                snackbar.setAction("UNDO", new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//
-//                        favoriteSection.restoreItem(item, position);
-//                        recyclerView.scrollToPosition(position);
-//                    }
-//                });
-//
-//                snackbar.setActionTextColor(Color.YELLOW);
-//                snackbar.show();
-//
-//            }
-//        };
-//
-//        ItemTouchHelper itemTouchhelper = new ItemTouchHelper(swipeToDeleteCallback);
-//        itemTouchhelper.attachToRecyclerView(recyclerView);
-//    }
-
-//    @Override
-//    public void onBindItemViewHolder(final RecyclerView.ViewHolder holder, final int position,
-//                                     final List<Object> payloads) {
-//
-//        final CompanyItemViewHolder itemHolder = (CompanyItemViewHolder) holder;
-//
-//        Company company = list.get(position);
-//
-//        for (Object obj : payloads) {
-//            if (obj instanceof ItemPriceUpdate) {
-//                itemHolder.ticker.setText(company.ticker);
-//                itemHolder.shares_or_name.setText(company.name);
-//                itemHolder.imgItem.setImageResource(company.arrow);
-//                itemHolder.change.setText(String.valueOf(company.change));
-//                itemHolder.change.setTextColor(company.changeColor);
-//                itemHolder.last.setText(company.last);
-//            }
-//        }
-//
-//        itemHolder.btnGoTo.setOnClickListener(v ->
-//                clickListener.onItemRootViewClicked(company, itemHolder.getAdapterPosition())
-//        );
-//    }
-
-
-
-//    void updateItemPrice(final int index, final String ticker, final String name_shares, final String last,
-//                         final double change, final @ColorInt int changeColor, final @DrawableRes int arrow) {
-//        Company watchItem = list.get(index);
-//
-//        watchItem.ticker = ticker;
-//        watchItem.name_or_shares = name_shares;
-//        watchItem.last = last;
-//        watchItem.change = change;
-//        watchItem.changeColor = changeColor;
-//        watchItem.arrow = arrow;
-//
-//    }
-//
-//    static class ItemPriceUpdate {
-//    }
 
     @Override
     public RecyclerView.ViewHolder getHeaderViewHolder(View view) {

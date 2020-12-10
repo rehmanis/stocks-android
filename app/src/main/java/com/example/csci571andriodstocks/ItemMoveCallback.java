@@ -1,7 +1,5 @@
 package com.example.csci571andriodstocks;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,15 +31,13 @@ public class ItemMoveCallback extends ItemTouchHelper.Callback {
     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
 
         int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
-//        Log.e("FLAGS", "My flags are");
+
         return makeMovementFlags(dragFlags, 0);
     }
 
     @Override
     public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                           RecyclerView.ViewHolder target) {
-//        mAdapter.onRowMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-//        Log.e("INSIDE", "TRUIN TO MOVEEEEEEEEEEEE");
         return true;
     }
 

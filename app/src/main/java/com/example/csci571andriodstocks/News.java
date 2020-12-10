@@ -1,13 +1,7 @@
 package com.example.csci571andriodstocks;
 
 import android.os.Build;
-import android.util.Log;
-
 import androidx.annotation.RequiresApi;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
 
@@ -32,7 +26,6 @@ public class News {
         this.title = title;
         this.url = url;
 
-//        Date date = new Date(timestamp);
         Date currentDate = new Date();
         Instant instant = Instant.parse(timestamp);
         long diff = currentDate.getTime() - instant.toEpochMilli();
@@ -51,37 +44,6 @@ public class News {
         }
 
         this.lastUpdated = days + lastAgoTxt;
-
-//        Log.i("TEST" , currentDate + " - " + instant + " - " + this.lastUpdated);
-
-//        try {
-////            final SimpleDateFormat df = new SimpleDateFormat(ISO_8601_24H_FULL_FORMAT);
-////            DateFormat df = new SimpleDateFormat("yyyy-mm-ddThh:mm:ssZ");
-//            Date date = new Date(timestamp);
-//            Date currentDate = new Date();
-//            Instant instant = Instant.parse(timestamp);
-//            long diff = currentDate.getTime() - instant.toEpochMilli();
-//            long days = (diff / (60*60*24*1000));
-//            String lastAgoTxt = "days ago";
-//
-//            if (days <= 0){
-//                days = (diff / (60*60*1000));
-//
-//                lastAgoTxt = "hours ago";
-//
-//                if (days <= 0){
-//                    days = (diff / (60*1000));
-//                    lastAgoTxt = "minutes ago";
-//                }
-//            }
-//
-//            this.lastUpdated = days + lastAgoTxt;
-//
-//            Log.e("TEST" , currentDate + " - " + instant + " - " + this.lastUpdated);
-//        } catch (ParseException e) {
-//            Log.e("TEST", "Exception", e);
-//        }
-
 
     }
 }

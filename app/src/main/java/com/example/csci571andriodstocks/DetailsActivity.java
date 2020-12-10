@@ -70,7 +70,6 @@ public class DetailsActivity extends AppCompatActivity {
     private GridView statGrid;
     private RecyclerView recyclerViewNews;
     private String[] stats;
-//    private ProgressBar spinner;
     private View spinnerContainer;
     private int numApiCalls;
     private boolean isApiFailed;
@@ -81,10 +80,6 @@ public class DetailsActivity extends AppCompatActivity {
     private String cashInHand;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-//    private Company currCompany;
-//    private String descBtnTxt = "Show more";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +107,6 @@ public class DetailsActivity extends AppCompatActivity {
 
 
         statGrid = findViewById(R.id.grid_view); // init GridView
-//        spinner = (ProgressBar)findViewById(R.id.progressbar);
         spinnerContainer = findViewById(R.id.progressbar_container);
         stats = new String[7];
         // Create an object of CustomAdapter and set Adapter to GirdView
@@ -142,8 +136,6 @@ public class DetailsActivity extends AppCompatActivity {
                     ImageButton btnChrome = dialog.findViewById(R.id.btn_chrome);
 
                     tvNewsTitle.setText(newsItem.title);
-//                    Picasso.with(ctx).load(newsItem.img)
-//                            .into(ivNewsImg);
 
                     Picasso.with(ctx).load(newsItem.img).resize(1300, 0).into(ivNewsImg);
 
@@ -332,12 +324,9 @@ public class DetailsActivity extends AppCompatActivity {
                 }
 
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                isApiFailed = true;
-                Log.i("error", "error in search http " + error);
-            }
+        }, (Response.ErrorListener) error -> {
+            isApiFailed = true;
+            Log.i("error", "error in search http " + error);
         });
     }
 
@@ -396,25 +385,6 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-//    private boolean checkTradeError(double sharesInputed) {
-//
-//        if (sharesInputed <= 0){
-//
-//            Toast toast = Toast.makeText(this, "Cannot sell less than 0 shares", Toast.LENGTH_SHORT);
-//            toast.show();
-//            return false;
-//        }
-//
-//        if (!myPortfolio.containsKey(ticker) || Double.parseDouble(myPortfolio.get(ticker)) < sharesInputed){
-//
-//            Toast toast = Toast.makeText(this, "Not enough shares to sell", Toast.LENGTH_SHORT);
-//            toast.show();
-//            return false;
-//        }
-//
-//        return true;
-//    }
-
 
     public void openSuccessDialog(double sharesTraded, String type) {
 
@@ -468,12 +438,6 @@ public class DetailsActivity extends AppCompatActivity {
         EditText etShareInput = (EditText) dialog.findViewById(R.id.et_dialog_input_shares);
         Button btnBuy = (Button) dialog.findViewById(R.id.btn_buy);
         Button btnSell = (Button) dialog.findViewById(R.id.btn_sell);
-
-
-//        etShareInput.requestFocus();
-//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
-
 
         cashInHand = sharedPreferences.getString(LocalStorage.CASH_IN_HAND, "20000.00");
 
@@ -624,8 +588,6 @@ public class DetailsActivity extends AppCompatActivity {
                         shares = Double.parseDouble(s.toString());
                     } catch(NumberFormatException e){
                         shares = 0;
-//                        Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
-//                        toast.show();
                     }
                 }
 
@@ -765,12 +727,7 @@ public class DetailsActivity extends AppCompatActivity {
                 }
 
             }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.i("error", "error in search http " + error);
-            }
-        });
+        }, error -> Log.i("error", "error in search http " + error));
     }
 
 

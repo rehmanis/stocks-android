@@ -39,8 +39,6 @@ public class ApiCall {
     public static void make(Context ctx, String query, String url, Response.Listener<String>
             listener, Response.ErrorListener errorListener) {
 
-//        String url = "https://csci571-trading-platform.wl.r.appspot.com/api/search/" + query;
-//        Log.i("url->", url + query);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url + query,
                 listener, errorListener);
         ApiCall.getInstance(ctx).addToRequestQueue(stringRequest);

@@ -1,8 +1,6 @@
 package com.example.csci571andriodstocks;
 
 import android.content.Context;
-import android.media.Image;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +24,6 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
     }
 
 
-
-//    private String[] localDataSet;
     private final List<News> newsList;
     private final OnItemClickListener clickListener;
     private final OnItemLongClickListener longClickListener;
@@ -128,10 +124,6 @@ public class CustomNewsAdapter extends RecyclerView.Adapter<CustomNewsAdapter.Vi
         viewHolder.getTvLastUpdated().setText(news.lastUpdated);
         viewHolder.getTvNewsTitle().setText(news.title);
         viewHolder.getTvNewsSrc().setText(news.src);
-
-//        if (position >=0 ){
-//            Log.e("NEWS", "urlToImg: " + news.img + "\ntitle: " + news.title);
-//        }
 
         ImageView ivNewsImg = (ImageView)  viewHolder.getIvNewsImg();
 

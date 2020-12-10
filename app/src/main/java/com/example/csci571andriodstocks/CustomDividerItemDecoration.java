@@ -2,7 +2,6 @@ package com.example.csci571andriodstocks;
 
 import android.content.Context;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.View;
 
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -25,8 +24,6 @@ public class CustomDividerItemDecoration extends DividerItemDecoration {
     @Override
     public void getItemOffsets (Rect outRect, View view, RecyclerView parent,
                                 RecyclerView.State state){
-
-//        Log.e("DRAW GET OFFSET", "state count: " + state.getItemCount() + " view count: " + parent.getChildAdapterPosition(view));
 
         if(parent.getChildAdapterPosition(view) == state.getItemCount() - 1){
             return;
