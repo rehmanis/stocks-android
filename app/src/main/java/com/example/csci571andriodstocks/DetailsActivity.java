@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
@@ -417,6 +418,11 @@ public class DetailsActivity extends AppCompatActivity {
 
     public void openSuccessDialog(double sharesTraded, String type) {
 
+        TextView tvMarketValue = findViewById(R.id.tvMarket_value);
+        TextView tvShares = findViewById(R.id.tvDetails_shares);
+        Locale locale = new Locale("en", "US");
+        NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
+
         final Dialog dialog = new Dialog(ctx);
         dialog.setContentView(R.layout.success_trade_dialog);
 
@@ -429,11 +435,24 @@ public class DetailsActivity extends AppCompatActivity {
         btnDone.setOnClickListener(v -> {
             dialog.dismiss();
             numApiCalls = TOT_API_CALLS - 1;
-            makeApiCallPrice(ticker);
 
         });
 
+        tvShares.setText("You have 0 shares of " + ticker);
 
+        myPortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+
+        if (myPortfolio.containsKey(ticker)){
+
+            String shares = myPortfolio.get(ticker);
+            double val = Double.parseDouble(shares) * lastPrice;
+            tvShares.setText("Shares owned: " + shares);
+            tvMarketValue.setText("Market Value: " + fmt.format(val));
+        }else {
+            tvMarketValue.setText("Start Trading|");
+        }
+
+        makeApiCallPrice(ticker);
 
     }
 
@@ -449,6 +468,11 @@ public class DetailsActivity extends AppCompatActivity {
         EditText etShareInput = (EditText) dialog.findViewById(R.id.et_dialog_input_shares);
         Button btnBuy = (Button) dialog.findViewById(R.id.btn_buy);
         Button btnSell = (Button) dialog.findViewById(R.id.btn_sell);
+
+
+//        etShareInput.requestFocus();
+//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 
 
         cashInHand = sharedPreferences.getString(LocalStorage.CASH_IN_HAND, "20000.00");
@@ -600,8 +624,8 @@ public class DetailsActivity extends AppCompatActivity {
                         shares = Double.parseDouble(s.toString());
                     } catch(NumberFormatException e){
                         shares = 0;
-                        Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
-                        toast.show();
+//                        Toast toast = Toast.makeText(ctx, "Please enter valid amount", Toast.LENGTH_SHORT);
+//                        toast.show();
                     }
                 }
 

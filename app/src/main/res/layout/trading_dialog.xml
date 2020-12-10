@@ -8,12 +8,15 @@
 
     <TextView
         android:id="@+id/tv_trading_title"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="TextView"
         android:textStyle="bold"
         android:textSize="18dp"
+        android:gravity="center"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -30,6 +33,7 @@
         android:hint="0"
         android:textSize="38dp"
         android:inputType="numberDecimal"
+        android:backgroundTint="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/textView3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_trading_title" />

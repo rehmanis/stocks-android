@@ -17,12 +17,10 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -31,19 +29,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 
-import android.widget.AutoCompleteTextView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,7 +49,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.github.luizgrp.sectionedrecyclerviewadapter.Section;
 import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
 
 public class MainActivity extends AppCompatActivity {
@@ -96,7 +88,10 @@ public class MainActivity extends AppCompatActivity {
     private int numApiCalls;
     private boolean isApiFailed;
     private Timer timer;
+    private boolean isSelectedFromList;
     CoordinatorLayout coordinatorLayout;
+    final Handler myHandler = new Handler();
+    private Runnable myRunnable;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -104,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        handleIntent(getIntent());
         setContentView(R.layout.activity_main);
+        isSelectedFromList = false;
         ctx = this;
         sharedPreferences = getSharedPreferences(LocalStorage.SHARED_PREFS_FILE, Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
@@ -126,11 +122,43 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(myToolbar);
 
         init();
+        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         enableSwipeToDeleteAndUndo();
         enableItemDragFavorite();
         enableItemDragPortfolio();
 
+        myRunnable = new Runnable() {
+            public void run() {
+                fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+                fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
 
+
+                String favTickers = String.join(",", fromStorageFavorite.keySet());
+                String portTickers = String.join(",", fromStoragePortfolio.keySet());
+
+                counter++;
+                Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
+                makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
+                makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
+            }
+        };
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void UpdateGUI() {
+//        fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+//        fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+//
+//
+//        String favTickers = String.join(",", fromStorageFavorite.keySet());
+//        String portTickers = String.join(",", fromStoragePortfolio.keySet());
+//
+//        counter++;
+//        Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
+//        makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
+//        makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
+        myHandler.post(myRunnable);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -139,6 +167,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         //When BACK BUTTON is pressed, the activity on the stack is restarted
         //Do what you want on the refresh procedure here
+//        isSelectedFromList = true;
         init();
         Log.e("RESTART","Activity restarted");
     }
@@ -147,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
     private void init() {
         numApiCalls = 0;
         isApiFailed = false;
+
 
         String date_n = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(new Date());
 
@@ -180,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(sectionedAdapter);
 
 
-        recyclerView.addItemDecoration(new CustomDividerItemDecoration(this, DividerItemDecoration.VERTICAL));
+
 
         spinnerContainer.setVisibility(View.VISIBLE);
 //        recyclerView.setVisibility(View.GONE);
@@ -199,24 +229,30 @@ public class MainActivity extends AppCompatActivity {
         makeApiCallPrice(LocalStorage.FAVOURITES, favoriteTickers);
         makeApiCallPrice(LocalStorage.PORTFOLIO, portfolioTickers);
 
+
+
+
+
+
         timer = new Timer();
         counter = 0;
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 // do your task here
+                UpdateGUI();
 
-                fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
-                fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
-
-
-                String favTickers = String.join(",", fromStorageFavorite.keySet());
-                String portTickers = String.join(",", fromStoragePortfolio.keySet());
-
-                counter++;
-                Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
-                makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
-                makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
+//                fromStorageFavorite = LocalStorage.getFromStorage(LocalStorage.FAVOURITES);
+//                fromStoragePortfolio = LocalStorage.getFromStorage(LocalStorage.PORTFOLIO);
+//
+//
+//                String favTickers = String.join(",", fromStorageFavorite.keySet());
+//                String portTickers = String.join(",", fromStoragePortfolio.keySet());
+//
+//                counter++;
+//                Log.e("AUTO-REFRESESH", "-----------Making API CALL #" + counter);
+//                makeApiCallPrice(LocalStorage.FAVOURITES, favTickers);
+//                makeApiCallPrice(LocalStorage.PORTFOLIO, portTickers);
             }
         }, 0, AUTO_REFRESH_PERIOD_MSEC);
     }
@@ -392,6 +428,8 @@ public class MainActivity extends AppCompatActivity {
 
         SearchView.SearchAutoComplete mSearchAutoComplete = searchView.findViewById(R.id.search_src_text);
 
+
+
 //        try {
 //            Field field = TextView.class.getDeclaredField("mCursorDrawableRes");
 //            field.setAccessible(true);
@@ -400,14 +438,24 @@ public class MainActivity extends AppCompatActivity {
 //            // Ignore exception
 //        }
 
-
         autoSuggestAdapter = new AutoSuggestAdapter(this,
                 android.R.layout.simple_dropdown_item_1line);
 
         mSearchAutoComplete.setAdapter(autoSuggestAdapter);
+        mSearchAutoComplete.setDropDownHeight(1300);
+//        mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) ->
+//                mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position)));
 
-        mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) ->
-                mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position).toString()));
+        mSearchAutoComplete.setOnItemClickListener((parent, view, position, id) -> {
+            //... your stuff
+
+            String query = (String)parent.getItemAtPosition(position);
+
+            mSearchAutoComplete.setText(autoSuggestAdapter.getObject(position));
+            isSelectedFromList = true;
+//            Log.e("Clicked", "I am here");
+        });
+
 
         mSearchAutoComplete.addTextChangedListener(new TextWatcher() {
             @Override
@@ -417,6 +465,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before,
                                       int count) {
+                isSelectedFromList = false;
                 handler.removeMessages(TRIGGER_AUTO_COMPLETE);
                 handler.sendEmptyMessageDelayed(TRIGGER_AUTO_COMPLETE,
                         AUTO_COMPLETE_DELAY);
@@ -430,6 +479,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
 //                Log.i("well", " this worked " + query);
+                if (!isSelectedFromList){
+
+                    return false;
+                }
                 String[] input = query.split("-");
                 redirectToDetails(input[0]);
                 return true;
@@ -437,6 +490,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                isSelectedFromList = false;
                 return false;
             }
         });
