@@ -6,10 +6,23 @@ An android app for virtual stock trading.
 
 ## Screen shots
 ### Home page
-[![Home page screen shot #1](./other/home-page1)]()[![Home page screen shot #2](./other/home-page2.png)]()[![Home page screen shot #3](./other/home-page3.png)]()[![Home page screen shot #4](./other/home-page4.png)]()
+
+<p float="left">
+  <img src="./other/home-page1.png" width="25%" />
+  <img src="./other/home-page2.png" width="25%" />
+  <img src="./other/home-page3.png" width="25%" />
+  <img src="./other/home-page4.png" width="25%" />
+</p>
+
 
 ### Stock Details page
-[![Details page screen shot #1](./other/details-page1.png)]()[![Details page screen shot #2](./other/details-page2.png)]()[![Details page screen shot #3](./other/details-page3.png)]()[![Details page screen shot #4](./other/details-page4.png)]()
+<p float="left">
+  <img src="./other/details-page1.png" width="25%" />
+  <img src="./other/details-page2.png" width="25%" />
+  <img src="./other/details-page3.png" width="25%" />
+  <img src="./other/details-page4.png" width="25%" />
+</p>
+
 
 ## Summary
 This Android app provides a platform for stocks trading, including, features such as searching company stock details, buying/selling stocks, keeping track of stock porfolio/favorites, viewing stock SMA charts and news, allowing sharing news on twitter for a given stock. Custom Nodejs backend deployed using GCP is used for all API calls. The backend uses [Tingo API](https://api.tiingo.com/) for all stock related data, and [News API](https://newsapi.org/) for displaying stock related news.[Highcharts](https://www.highcharts.com/) is used for displaying the SMA chart data for a given ticker.
