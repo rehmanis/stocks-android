@@ -8,19 +8,19 @@ An android app for virtual stock trading.
 ### Home page
 
 <p float="left">
-  <img src="./other/home-page1.png" width="25%" />
-  <img src="./other/home-page2.png" width="25%" />
-  <img src="./other/home-page3.png" width="25%" />
-  <img src="./other/home-page4.png" width="25%" />
+  <img src="./other/home-page1.png" width="20%" />
+  <img src="./other/home-page2.png" width="20%" />
+  <img src="./other/home-page3.png" width="20%" />
+  <img src="./other/home-page4.png" width="20%" />
 </p>
 
 
 ### Stock Details page
 <p float="left">
-  <img src="./other/details-page1.png" width="25%" />
-  <img src="./other/details-page2.png" width="25%" />
-  <img src="./other/details-page3.png" width="25%" />
-  <img src="./other/details-page4.png" width="25%" />
+  <img src="./other/details-page1.png" width="20%" />
+  <img src="./other/details-page2.png" width="20%" />
+  <img src="./other/details-page3.png" width="20%" />
+  <img src="./other/details-page4.png" width="20%" />
 </p>
 
 
