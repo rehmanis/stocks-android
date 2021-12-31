@@ -53,8 +53,11 @@ This Android app provides a platform for stocks trading, including, features suc
 * Open the app inside [Android Studio](https://developer.android.com/studio)
 * Make sure to use JDK 1.8.0 (The project uses Java 8)
 * In Android Studio under `File` click `Sync project with Grade Files`.
-* Add the `Pixel 2XL 28` emulator device (App has not been tested with other emulator device) [![add emulator](./other/add-emulator.png)](). 
-* On the pop up window, click the create virtual device button and add `Pixel 2XL 28`
+* Add the `Pixel 2 XL 28` (App has not been tested with other emulator device) emulator device by clicking `AVD Manager` as shown below. 
+
+  [![add emulator](./other/add-emulator.png)](). 
+  
+* On the pop up window, click the `Create Virtual Device` button and add `Pixel 2 XL 28` [![add virtual device](./other/add-virtual-device.png)]()
 * Once you have successfully added the virtual device, you should see it as shown below. Now you can click the run button and it should load the emulator with the app.
 [![add emulator](./other/run-app.png)]()
 * The emulator will launch and will automatically open the stock app as shown below. [![lauched app](./other/lauch-app.png)]()
